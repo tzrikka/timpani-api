@@ -1,0 +1,77 @@
+version: "2"
+
+linters:
+  enable:
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - dupl
+    - dupword
+    - embeddedstructfieldcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exptostd
+    - fatcontext
+    - gocheckcompilerdirectives
+    - goconst
+    - gocritic
+    - godot
+    - godox
+    - gosec
+    - gosmopolitan
+    - govet
+    - ineffassign
+    - intrange
+    - mirror
+    - misspell
+    - musttag
+    - noctx
+    - nosprintfhostport
+    - perfsprint
+    - predeclared
+    - recvcheck
+    # - revive
+    - staticcheck
+    - thelper
+    - unconvert
+    - unused
+    - usestdlibvars
+    - usetesting
+    - zerologlint
+
+  settings:
+    godot:
+      scope: all
+      capital: true
+    misspell:
+      locale: US
+    predeclared:
+      qualified-name: true
+
+formatters:
+  enable:
+    - gci
+    - gofumpt
+    - golines
+
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/tzrikka)
+    gofumpt:
+      extra-rules: true
+    golines:
+      max-len: 150
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  fix: true
