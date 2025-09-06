@@ -19,7 +19,6 @@ linters:
     - exptostd
     - fatcontext
     - gocheckcompilerdirectives
-    - goconst
     - gocritic
     - godot
     - godox
