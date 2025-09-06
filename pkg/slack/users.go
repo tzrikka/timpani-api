@@ -9,7 +9,6 @@ import (
 const (
 	UsersConversationsActivityName = "slack.users.conversations"
 	UsersGetPresenceActivityName   = "slack.users.getPresence"
-	UsersIdentityActivityName      = "slack.users.identity"
 	UsersInfoActivityName          = "slack.users.info"
 	UsersListActivityName          = "slack.users.list"
 	UsersLookupByEmailActivityName = "slack.users.lookupByEmail"
