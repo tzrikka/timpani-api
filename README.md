@@ -44,4 +44,4 @@ You may also call Temporal's [`workflow.ExecuteActivity()`](https://pkg.go.dev/g
 
 - `*ActivityName` string as the `activity` parameter
 - `*Request` struct as the `args` parameter
-- Reference to an empty `*Response` struct as the `valuePtr` parameter in `workflow.Future.Get()` calls
+- Reference to an empty `*Response` struct as the `valuePtr` parameter in [`workflow.Future.Get()`](https://pkg.go.dev/go.temporal.io/sdk/internal#Future) calls
