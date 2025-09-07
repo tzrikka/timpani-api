@@ -33,9 +33,7 @@ type ConversationsArchiveRequest struct {
 }
 
 // https://docs.slack.dev/reference/methods/conversations.archive/
-type ConversationsArchiveResponse struct {
-	Response
-}
+type ConversationsArchiveResponse Response
 
 // https://docs.slack.dev/reference/methods/conversations.archive/
 func ConversationsArchiveActivity(ctx workflow.Context, channelID string) error {

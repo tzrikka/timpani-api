@@ -96,9 +96,7 @@ type BookmarksRemoveRequest struct {
 }
 
 // https://docs.slack.dev/reference/methods/bookmarks.remove/
-type BookmarksRemoveResponse struct {
-	Response
-}
+type BookmarksRemoveResponse Response
 
 // https://docs.slack.dev/reference/methods/bookmarks.remove/
 func BookmarksRemoveActivity(ctx workflow.Context, channelID, bookmarkID string) error {

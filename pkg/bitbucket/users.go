@@ -19,14 +19,36 @@ type UsersGetRequest struct {
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
-func UsersGetActivity(ctx workflow.Context, accountID, uuid string) (map[string]any, error) {
+type UsersGetResponse User
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+func UsersGetActivity(ctx workflow.Context, accountID, uuid string) (*UsersGetResponse, error) {
 	req := UsersGetRequest{AccountID: accountID, UUID: uuid}
 	fut := internal.ExecuteTimpaniActivity(ctx, UsersGetActivityName, req)
 
-	resp := &map[string]any{}
+	resp := new(UsersGetResponse)
 	if err := fut.Get(ctx, resp); err != nil {
-		return *resp, err
+		return nil, err
 	}
 
-	return *resp, nil
+	return resp, nil
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
+type User struct {
+	Type string `json:"type"`
+
+	DisplayName string `json:"display_name"`
+	Nickname    string `json:"nickname"`
+	AccountID   string `json:"account_id"`
+	UUID        string `json:"uuid"`
+
+	Links map[string]Link `json:"links"`
+}
+
+type Link struct {
+	HRef string `json:"href"`
 }

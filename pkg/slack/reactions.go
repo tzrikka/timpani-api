@@ -95,9 +95,7 @@ type ReactionsRemoveRequest struct {
 }
 
 // https://docs.slack.dev/reference/methods/reactions.remove/
-type ReactionsRemoveResponse struct {
-	Response
-}
+type ReactionsRemoveResponse Response
 
 // https://docs.slack.dev/reference/methods/reactions.remove/
 func ReactionsRemoveActivity(ctx workflow.Context, channelID, timestamp, name string) error {
