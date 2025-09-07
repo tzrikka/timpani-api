@@ -1,3 +1,5 @@
+// Package internal requests the Timpani worker to execute
+// Temporal activities with preconfigured Temporal options.
 package internal
 
 import (
@@ -6,14 +8,17 @@ import (
 	"github.com/tzrikka/timpani-api/pkg/temporal"
 )
 
-// ExecuteTimpaniActivity requests the execution of a [Timpani activity] in the
-// context of a Temporal workflow, with preconfigured [temporal.ActivityOptions]
-// related to timeouts and retries.
+// ExecuteTimpaniActivity requests the [Timpani worker] to execute one
+// of its [activities] on behalf of the calling Temporal workflow, with
+// preconfigured [temporal.ActivityOptions] related to timeouts and retries.
 //
-// [Timpani]: https://pkg.go.dev/github.com/tzrikka/timpani/pkg/api
+// [Timpani worker]: https://pkg.go.dev/github.com/tzrikka/timpani
+// [activities]: https://pkg.go.dev/github.com/tzrikka/timpani/pkg/api
 func ExecuteTimpaniActivity(ctx workflow.Context, name string, req any) workflow.Future {
-	if temporal.ActivityOptions != nil {
-		ctx = workflow.WithActivityOptions(ctx, *temporal.ActivityOptions)
+	opts := temporal.ActivityOptions
+	if opts == nil {
+		opts = temporal.DefaultActivityOptions("timpani")
 	}
-	return workflow.ExecuteActivity(ctx, name, req)
+
+	return workflow.ExecuteActivity(workflow.WithActivityOptions(ctx, *opts), name, req)
 }
