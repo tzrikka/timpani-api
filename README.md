@@ -38,9 +38,9 @@ workflow.ActivityOptions{
 }
 ```
 
-Then you may call any `*Activity()` function from any [`timpani-api` subpackage](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg).
+Then you may call any `*Activity()` function from any [`timpani-api`](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg) subpackage.
 
-You may also call Temporal's [`workflow.ExecuteActivity()`](https://pkg.go.dev/go.temporal.io/sdk/workflow#ExecuteActivity) function directly, and just use the following from any [`timpani-api` subpackage](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg):
+You may also call Temporal's [`workflow.ExecuteActivity()`](https://pkg.go.dev/go.temporal.io/sdk/workflow#ExecuteActivity) function directly, and just use the following from any [`timpani-api`](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg) subpackage:
 
 - `*ActivityName` string as the `activity` parameter
 - `*Request` struct as the `args` parameter
