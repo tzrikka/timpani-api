@@ -22,8 +22,10 @@ func DefaultActivityOptions(taskQueue string) *workflow.ActivityOptions {
 	return &workflow.ActivityOptions{
 		TaskQueue:           taskQueue,
 		StartToCloseTimeout: 5 * time.Second,
-		RetryPolicy: &temporal.RetryPolicy{
+		RetryPolicy: &RetryPolicy{
 			MaximumAttempts: 5,
 		},
 	}
 }
+
+type RetryPolicy = temporal.RetryPolicy
