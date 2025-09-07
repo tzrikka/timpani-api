@@ -11,7 +11,7 @@ Timpani is a Temporal worker that sends API calls and receives asynchronous even
 
 ## Usage
 
-First, when your Temporal worker starts, initialize the Temporal [activity options](https://pkg.go.dev/go.temporal.io/sdk/internal#ActivityOptions) for all Timpani activities.
+First, when your Temporal worker starts, initialize the [activity options](https://pkg.go.dev/go.temporal.io/sdk/internal#ActivityOptions) for all Timpani activities.
 
 ```go
 import (
@@ -19,14 +19,16 @@ import (
     "go.temporal.io/sdk/workflow"
 )
 
-temporal.ActivityOptions = temporal.DefaultActivityOptions("my-task-queue-name")
+temporal.ActivityOptions = temporal.DefaultActivityOptions("timpani")
 
 // Or:
 
 temporal.ActivityOptions = &workflow.ActivityOptions{ /* ... */ }
 ```
 
-Without this, the package's defaults are `DefaultActivityOptions("timpani")`, i.e.:
+This is especially important if you changed your Timpani worker's task queue name to something other than the default `"timpani"`.
+
+Note that the package's defaults are `DefaultActivityOptions("timpani")`, i.e.:
 
 ```go
 workflow.ActivityOptions{
@@ -38,10 +40,40 @@ workflow.ActivityOptions{
 }
 ```
 
-Then you may call any `*Activity()` function from any [`timpani-api`](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg) subpackage.
+Now you can call any `*Activity()` function from any [`timpani-api`](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg) subpackage, for example:
+
+```go
+import "github.com/tzrikka/timpani-api/pkg/slack"
+
+bot, err := slack.BotsInfoActivity(ctx, botID)
+```
 
 You may also call Temporal's [`workflow.ExecuteActivity()`](https://pkg.go.dev/go.temporal.io/sdk/workflow#ExecuteActivity) function directly, and just use the following from any [`timpani-api`](https://pkg.go.dev/github.com/tzrikka/timpani-api/pkg) subpackage:
 
 - `*ActivityName` string as the `activity` parameter
 - `*Request` struct as the `args` parameter
 - Reference to an empty `*Response` struct as the `valuePtr` parameter in [`workflow.Future.Get()`](https://pkg.go.dev/go.temporal.io/sdk/internal#Future) calls
+
+Example:
+
+```go
+import (
+    "github.com/tzrikka/timpani-api/pkg/slack"
+    "go.temporal.io/sdk/workflow"
+)
+
+func SlackBotInfo(ctx workflow.Context, botID string) (*slack.Bot, error) {
+    req := slack.BotsInfoRequest{Bot: botID}
+    opts := workflow.ActivityOptions{ /* ... */ }
+    actx := workflow.WithActivityOptions(ctx, opts)
+
+    fut := workflow.ExecuteActivity(actx, slack.BotsInfoActivityName, req)
+
+    resp := new(slack.BotsInfoResponse)
+    if err := fut.Get(ctx, resp); err != nil {
+        return nil, err
+    }
+
+    return resp.Bot, nil
+}
+```
