@@ -10,14 +10,14 @@ import (
 )
 
 // ActivityOptions are used when executing all Timpani activities.
-// Temporal workers that use Timpani should override this global
-// variable in order to set the Temporal task queue name.
+// Temporal workers that use Timpani may override this global variable
+// to set a custom Temporal task queue name for the Timpani worker.
 var ActivityOptions = DefaultActivityOptions("timpani")
 
 // DefaultActivityOptions adds a few reasonable values
-// to the [workflow.ActivityOptions] defaults.
-//   - Maximum number of attempts = 5
-//   - Maximum runtime for each attempt = 5 seconds
+// to the [workflow.ActivityOptions] defaults:
+//   - Maximum number of attempts = 5,
+//   - Maximum runtime for each attempt = 5 seconds.
 func DefaultActivityOptions(taskQueue string) *workflow.ActivityOptions {
 	return &workflow.ActivityOptions{
 		TaskQueue:           taskQueue,
