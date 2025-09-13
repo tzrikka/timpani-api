@@ -18,14 +18,15 @@ type PullRequestsCreateCommentRequest struct {
 	RepoSlug      string `json:"repo_slug"`
 	PullRequestID string `json:"pull_request_id"`
 	Markdown      string `json:"text"`
+
+	ParentID string `json:"parent_id,omitempty"`
 }
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
 type PullRequestsCreateCommentResponse = map[string]any
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
-func PullRequestsCreateCommentActivity(ctx workflow.Context, workspace, repo, prID, markdown, linkID string) (*PullRequestsCreateCommentResponse, error) {
-	req := PullRequestsCreateCommentRequest{ThrippyLinkID: linkID, Workspace: workspace, RepoSlug: repo, PullRequestID: prID, Markdown: markdown}
+func PullRequestsCreateCommentActivity(ctx workflow.Context, req PullRequestsCreateCommentRequest) (*PullRequestsCreateCommentResponse, error) {
 	fut := internal.ExecuteTimpaniActivity(ctx, PullRequestsCreateCommentActivityName, req)
 
 	resp := new(PullRequestsCreateCommentResponse)
