@@ -48,7 +48,3 @@ type User struct {
 
 	Links map[string]Link `json:"links"`
 }
-
-type Link struct {
-	HRef string `json:"href"`
-}

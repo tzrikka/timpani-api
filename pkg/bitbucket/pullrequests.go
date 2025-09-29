@@ -8,6 +8,8 @@ import (
 
 const (
 	PullRequestsCreateCommentActivityName = "bitbucket.pullrequests.createComment"
+	PullRequestsDeleteCommentActivityName = "bitbucket.pullrequests.deleteComment"
+	PullRequestsUpdateCommentActivityName = "bitbucket.pullrequests.updateComment"
 )
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
@@ -23,7 +25,23 @@ type PullRequestsCreateCommentRequest struct {
 }
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
-type PullRequestsCreateCommentResponse = map[string]any
+type PullRequestsCreateCommentResponse struct {
+	// Type string `json:"type"` // Always "pullrequest_comment".
+
+	ID int `json:"id"`
+
+	// Content          `json:"content"`     // Inconsequential.
+	// PullRequest      `json:"pullrequest"` // Inconsequential.
+	// CreatedOn string `json:"created_on"`  // Inconsequential.
+	// UpdatedOn string `json:"updated_on"`  // Inconsequential.
+	// Deleted   bool   `json:"deleted"`     // Always false.
+	// Pending   bool   `json:"pending"`     // Inconsequential.
+
+	User   User    `json:"user"`
+	Parent *Parent `json:"parent,omitempty"`
+
+	Links map[string]Link `json:"links"`
+}
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
 func PullRequestsCreateCommentActivity(ctx workflow.Context, req PullRequestsCreateCommentRequest) (*PullRequestsCreateCommentResponse, error) {
@@ -35,4 +53,44 @@ func PullRequestsCreateCommentActivity(ctx workflow.Context, req PullRequestsCre
 	}
 
 	return resp, nil
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
+type PullRequestsDeleteCommentRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+	CommentID     string `json:"comment_id"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
+func PullRequestsDeleteCommentActivity(ctx workflow.Context, req PullRequestsDeleteCommentRequest) error {
+	return internal.ExecuteTimpaniActivity(ctx, PullRequestsDeleteCommentActivityName, req).Get(ctx, nil)
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-put
+type PullRequestsUpdateCommentRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+	CommentID     string `json:"comment_id"`
+	Markdown      string `json:"text"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-put
+func PullRequestsUpdateCommentActivity(ctx workflow.Context, req PullRequestsUpdateCommentRequest) error {
+	return internal.ExecuteTimpaniActivity(ctx, PullRequestsUpdateCommentActivityName, req).Get(ctx, nil)
+}
+
+type Link struct {
+	HRef string `json:"href"`
+}
+
+type Parent struct {
+	ID    int             `json:"id"`
+	Links map[string]Link `json:"links"`
 }
