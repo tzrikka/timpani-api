@@ -126,6 +126,19 @@ type ConversationsInfoResponse struct {
 	Channel map[string]any `json:"channel,omitempty"`
 }
 
+// https://docs.slack.dev/reference/methods/conversations.info/
+func ConversationsInfoActivity(ctx workflow.Context, channelID string, locale, numMembers bool) (map[string]any, error) {
+	req := ConversationsInfoRequest{Channel: channelID, IncludeLocale: locale, IncludeNumMembers: numMembers}
+	fut := internal.ExecuteTimpaniActivity(ctx, ConversationsInfoActivityName, req)
+
+	resp := new(ConversationsInfoResponse)
+	if err := fut.Get(ctx, resp); err != nil {
+		return nil, err
+	}
+
+	return resp.Channel, nil
+}
+
 // https://docs.slack.dev/reference/methods/conversations.invite/
 type ConversationsInviteRequest struct {
 	Channel string `json:"channel"`
