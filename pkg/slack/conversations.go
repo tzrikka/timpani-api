@@ -270,6 +270,12 @@ type ConversationsRenameResponse struct {
 	Channel map[string]any `json:"channel,omitempty"`
 }
 
+// https://docs.slack.dev/reference/methods/conversations.rename/
+func ConversationsRenameActivity(ctx workflow.Context, channelID, name string) error {
+	req := ConversationsRenameRequest{Channel: channelID, Name: name}
+	return internal.ExecuteTimpaniActivity(ctx, ConversationsRenameActivityName, req).Get(ctx, nil)
+}
+
 // https://docs.slack.dev/reference/methods/conversations.replies/
 type ConversationsRepliesRequest struct {
 	Channel string `json:"channel"`
