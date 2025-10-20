@@ -23,8 +23,8 @@ type WorkspacesListMembersResponse struct {
 	Values []Membership `json:"values,omitempty"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen int    `json:"pagelen,omitempty"`
 	Page    int    `json:"page,omitempty"`
-	Pagelen int    `json:"pagelen,omitempty"`
 	Next    string `json:"next,omitempty"`
 }
 
