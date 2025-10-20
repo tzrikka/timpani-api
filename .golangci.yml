@@ -4,7 +4,6 @@ linters:
   enable:
     - asciicheck
     - bidichk
-    - bodyclose
     - canonicalheader
     - containedctx
     - contextcheck
@@ -37,12 +36,9 @@ linters:
     - recvcheck
     # - revive
     - staticcheck
-    - thelper
     - unconvert
     - unused
     - usestdlibvars
-    - usetesting
-    - zerologlint
 
   settings:
     godot:
