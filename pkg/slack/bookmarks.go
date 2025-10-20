@@ -34,8 +34,8 @@ type BookmarksAddResponse struct {
 }
 
 // https://docs.slack.dev/reference/methods/bookmarks.add/
-func BookmarksAddActivity(ctx workflow.Context, channelID, title, url string) error {
-	req := BookmarksAddRequest{ChannelID: channelID, Title: title, Type: "link", Link: url}
+func BookmarksAddActivity(ctx workflow.Context, channelID, title, url, emoji string) error {
+	req := BookmarksAddRequest{ChannelID: channelID, Title: title, Type: "link", Link: url, Emoji: emoji}
 	return internal.ExecuteTimpaniActivity(ctx, BookmarksAddActivityName, req).Get(ctx, nil)
 }
 
