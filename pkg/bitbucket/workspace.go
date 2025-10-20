@@ -1,6 +1,8 @@
 package bitbucket
 
 import (
+	"errors"
+
 	"go.temporal.io/sdk/workflow"
 
 	"github.com/tzrikka/timpani-api/internal"
@@ -18,12 +20,12 @@ type WorkspacesListMembersRequest struct {
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type WorkspacesListMembersResponse struct {
-	Size     int          `json:"size,omitempty"`
-	Page     int          `json:"page,omitempty"`
-	Pagelen  int          `json:"pagelen,omitempty"`
-	Next     string       `json:"next,omitempty"`
-	Previous string       `json:"previous,omitempty"`
-	Values   []Membership `json:"values,omitempty"`
+	Values []Membership `json:"values,omitempty"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	Page    int    `json:"page,omitempty"`
+	Pagelen int    `json:"pagelen,omitempty"`
+	Next    string `json:"next,omitempty"`
 }
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
@@ -34,6 +36,10 @@ func WorkspacesListMembersActivity(ctx workflow.Context, workspace string, email
 	resp := new(WorkspacesListMembersResponse)
 	if err := fut.Get(ctx, resp); err != nil {
 		return nil, err
+	}
+
+	if resp.Next != "" {
+		return nil, errors.New("pagination not implemented")
 	}
 
 	users := make([]User, len(resp.Values))

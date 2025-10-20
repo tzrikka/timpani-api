@@ -80,7 +80,8 @@ type PullRequestsListCommitsRequest struct {
 	PullRequestID string `json:"pull_request_id"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
-	Page int `json:"page,omitempty"`
+	Page    int `json:"page,omitempty"`
+	Pagelen int `json:"pagelen,omitempty"`
 }
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-commits-get
@@ -88,7 +89,8 @@ type PullRequestsListCommitsResponse struct {
 	Values []Commit `json:"values"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
-	Pagelen int    `json:"pagelen"`
+	Page    int    `json:"page,omitempty"`
+	Pagelen int    `json:"pagelen,omitempty"`
 	Next    string `json:"next,omitempty"`
 }
 
