@@ -40,9 +40,9 @@ type UsersSearchRequest struct {
 // https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
 func UsersSearchActivity(ctx workflow.Context, query string) ([]User, error) {
 	req := UsersSearchRequest{Query: query}
-	fut := internal.ExecuteTimpaniActivity(ctx, UsersGetActivityName, req)
+	fut := internal.ExecuteTimpaniActivity(ctx, UsersSearchActivityName, req)
 
-	resp := []User{}
+	var resp []User
 	if err := fut.Get(ctx, &resp); err != nil {
 		return nil, err
 	}
