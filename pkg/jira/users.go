@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	UsersGetActivityName = "jira.users.get"
+	UsersGetActivityName    = "jira.users.get"
+	UsersSearchActivityName = "jira.users.search"
 )
 
 // https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
@@ -31,7 +32,26 @@ func UsersGetActivity(ctx workflow.Context, accountID string) (*UsersGetResponse
 	return resp, nil
 }
 
+// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
+type UsersSearchRequest struct {
+	Query string `json:"query"`
+}
+
+// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
+func UsersSearchActivity(ctx workflow.Context, query string) ([]User, error) {
+	req := UsersSearchRequest{Query: query}
+	fut := internal.ExecuteTimpaniActivity(ctx, UsersGetActivityName, req)
+
+	resp := []User{}
+	if err := fut.Get(ctx, &resp); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 // https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
+// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
 type User struct {
 	Self        string `json:"self"`
 	AccountID   string `json:"accountId"`
