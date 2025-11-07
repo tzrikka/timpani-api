@@ -7,11 +7,31 @@ import (
 )
 
 const (
-	PullRequestsCreateCommentActivityName = "bitbucket.pullrequests.createComment"
-	PullRequestsDeleteCommentActivityName = "bitbucket.pullrequests.deleteComment"
-	PullRequestsListCommitsActivityName   = "bitbucket.pullrequests.listCommits"
-	PullRequestsUpdateCommentActivityName = "bitbucket.pullrequests.updateComment"
+	PullRequestsApproveActivityName         = "bitbucket.pullrequests.approve"
+	PullRequestsCreateCommentActivityName   = "bitbucket.pullrequests.createComment"
+	PullRequestsDeclineActivityName         = "bitbucket.pullrequests.decline"
+	PullRequestsDeleteCommentActivityName   = "bitbucket.pullrequests.deleteComment"
+	PullRequestsListActivityLogActivityName = "bitbucket.pullrequests.listActivityLog"
+	PullRequestsListCommitsActivityName     = "bitbucket.pullrequests.listCommits"
+	PullRequestsListForCommitActivityName   = "bitbucket.pullrequests.listForCommit"
+	PullRequestsMergeActivityName           = "bitbucket.pullrequests.merge"
+	PullRequestsUnapproveActivityName       = "bitbucket.pullrequests.unapprove"
+	PullRequestsUpdateCommentActivityName   = "bitbucket.pullrequests.updateComment"
 )
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
+type PullRequestsApproveRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
+func PullRequestsApproveActivity(ctx workflow.Context, req PullRequestsApproveRequest) error {
+	return internal.ExecuteTimpaniActivity(ctx, PullRequestsApproveActivityName, req).Get(ctx, nil)
+}
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
 type PullRequestsCreateCommentRequest struct {
@@ -31,12 +51,12 @@ type PullRequestsCreateCommentResponse struct {
 
 	ID int `json:"id"`
 
-	// Content          `json:"content"`     // Inconsequential.
-	// PullRequest      `json:"pullrequest"` // Inconsequential.
-	// CreatedOn string `json:"created_on"`  // Inconsequential.
-	// UpdatedOn string `json:"updated_on"`  // Inconsequential.
+	// Content          `json:"content"`     // Unnecessary.
+	// PullRequest      `json:"pullrequest"` // Unnecessary.
+	// CreatedOn string `json:"created_on"`  // Unnecessary.
+	// UpdatedOn string `json:"updated_on"`  // Unnecessary.
 	// Deleted   bool   `json:"deleted"`     // Always false.
-	// Pending   bool   `json:"pending"`     // Inconsequential.
+	// Pending   bool   `json:"pending"`     // Unnecessary.
 
 	User   User    `json:"user"`
 	Parent *Parent `json:"parent,omitempty"`
@@ -56,6 +76,20 @@ func PullRequestsCreateCommentActivity(ctx workflow.Context, req PullRequestsCre
 	return resp, nil
 }
 
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-decline-post
+type PullRequestsDeclineRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-decline-post
+func PullRequestsDeclineActivity(ctx workflow.Context, req PullRequestsDeclineRequest) error {
+	return internal.ExecuteTimpaniActivity(ctx, PullRequestsDeclineActivityName, req).Get(ctx, nil)
+}
+
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
 type PullRequestsDeleteCommentRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
@@ -69,6 +103,41 @@ type PullRequestsDeleteCommentRequest struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
 func PullRequestsDeleteCommentActivity(ctx workflow.Context, req PullRequestsDeleteCommentRequest) error {
 	return internal.ExecuteTimpaniActivity(ctx, PullRequestsDeleteCommentActivityName, req).Get(ctx, nil)
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
+type PullRequestsListActivityLogRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen  string `json:"pagelen,omitempty"`
+	Page     string `json:"page,omitempty"`
+	AllPages bool   `json:"all_pages,omitempty"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
+type PullRequestsListActivityLogResponse struct {
+	Values []map[string]any `json:"values"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen int    `json:"pagelen,omitempty"`
+	Next    string `json:"next,omitempty"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
+func PullRequestsListActivityLogActivity(ctx workflow.Context, req PullRequestsListActivityLogRequest) (*PullRequestsListActivityLogResponse, error) {
+	fut := internal.ExecuteTimpaniActivity(ctx, PullRequestsListActivityLogActivityName, req)
+
+	resp := new(PullRequestsListActivityLogResponse)
+	if err := fut.Get(ctx, resp); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-commits-get
@@ -107,6 +176,75 @@ func PullRequestsListCommitsActivity(ctx workflow.Context, req PullRequestsListC
 	return resp, nil
 }
 
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-commit-commit-pullrequests-get
+type PullRequestsListForCommitRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace string `json:"workspace"`
+	RepoSlug  string `json:"repo_slug"`
+	Commit    string `json:"commit"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen  string `json:"pagelen,omitempty"`
+	Page     string `json:"page,omitempty"`
+	AllPages bool   `json:"all_pages,omitempty"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-commit-commit-pullrequests-get
+type PullRequestsListForCommitResponse struct {
+	Values []map[string]any `json:"values"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen int    `json:"pagelen,omitempty"`
+	Page    int    `json:"page,omitempty"`
+	Next    string `json:"next,omitempty"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-commit-commit-pullrequests-get
+func PullRequestsListForCommitActivity(ctx workflow.Context, req PullRequestsListForCommitRequest) (*PullRequestsListForCommitResponse, error) {
+	fut := internal.ExecuteTimpaniActivity(ctx, PullRequestsListForCommitActivityName, req)
+
+	resp := new(PullRequestsListForCommitResponse)
+	if err := fut.Get(ctx, resp); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-merge-post
+type PullRequestsMergeRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+
+	Type              string `json:"type,omitempty"`
+	Message           string `json:"message,omitempty"`
+	MergeStrategy     string `json:"merge_strategy,omitempty"`
+	CloseSourceBranch bool   `json:"close_source_branch,omitempty"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-merge-post
+func PullRequestsMergeActivity(ctx workflow.Context, req PullRequestsMergeRequest) error {
+	return internal.ExecuteTimpaniActivity(ctx, PullRequestsMergeActivityName, req).Get(ctx, nil)
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-delete
+type PullRequestsUnapproveRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-delete
+func PullRequestsUnapproveActivity(ctx workflow.Context, req PullRequestsUnapproveRequest) error {
+	return internal.ExecuteTimpaniActivity(ctx, PullRequestsUnapproveActivityName, req).Get(ctx, nil)
+}
+
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-put
 type PullRequestsUpdateCommentRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
@@ -133,7 +271,7 @@ type Commit struct {
 	Summary *Rendered `json:"summary,omitempty"`
 	Parents []Commit  `json:"parents,omitempty"`
 
-	// Repository *Repository `json:"repository,omitempty"` // Inconsequential.
+	// Repository *Repository `json:"repository,omitempty"` // Unnecessary.
 
 	Links map[string]Link `json:"links"`
 }

@@ -53,9 +53,9 @@ func WorkspacesListMembersActivity(ctx workflow.Context, workspace string, email
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type Membership struct {
 	// Type  string `json:"type"`           // Always "workspace_membership".
-	// Links map[string]Link `json:"links"` // Inconsequential.
+	// Links map[string]Link `json:"links"` // Unnecessary.
 
 	User User `json:"user"`
 
-	// Workspace // Inconsequential.
+	// Workspace // Unnecessary.
 }
