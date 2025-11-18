@@ -17,6 +17,8 @@ type CommitsDiffRequest struct {
 	Workspace string `json:"workspace"`
 	RepoSlug  string `json:"repo_slug"`
 	Spec      string `json:"spec"`
+
+	Path string `json:"path,omitempty"`
 }
 
 func CommitsDiffActivity(ctx workflow.Context, req CommitsDiffRequest) (string, error) {
