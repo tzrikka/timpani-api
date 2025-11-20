@@ -68,8 +68,9 @@ func FilesCompleteUploadExternalActivity(ctx workflow.Context, fileID, title, ch
 }
 
 type TimpaniUploadExternalRequest struct {
-	Content  []byte `json:"content"`
+	URL      string `json:"url"`
 	MimeType string `json:"mime_type"`
+	Content  []byte `json:"content"`
 }
 
 func TimpaniUploadExternalActivity(ctx workflow.Context, content []byte, mimeType string) error {
