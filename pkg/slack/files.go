@@ -73,8 +73,8 @@ type TimpaniUploadExternalRequest struct {
 	Content  []byte `json:"content"`
 }
 
-func TimpaniUploadExternalActivity(ctx workflow.Context, content []byte, mimeType string) error {
-	req := TimpaniUploadExternalRequest{Content: content, MimeType: mimeType}
+func TimpaniUploadExternalActivity(ctx workflow.Context, url, mimeType string, content []byte) error {
+	req := TimpaniUploadExternalRequest{URL: url, MimeType: mimeType, Content: content}
 	return internal.ExecuteTimpaniActivity(ctx, TimpaniUploadExternalActivityName, req).Get(ctx, nil)
 }
 
