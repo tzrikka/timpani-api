@@ -58,7 +58,7 @@ type FilesCompleteUploadExternalRequest struct {
 type FilesCompleteUploadExternalResponse struct {
 	Response
 
-	Files []File `json:"files,omitempty"`
+	Files []map[string]any `json:"files,omitempty"`
 }
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
