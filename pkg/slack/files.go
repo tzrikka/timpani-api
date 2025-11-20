@@ -40,7 +40,7 @@ func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, name, s
 		return "", "", err
 	}
 
-	return resp.FileID, resp.UploadURL, nil
+	return resp.UploadURL, resp.FileID, nil
 }
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
