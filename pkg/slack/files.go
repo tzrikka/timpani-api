@@ -9,6 +9,8 @@ import (
 const (
 	FilesGetUploadURLExternalActivityName   = "slack.files.getUploadURLExternal"
 	FilesCompleteUploadExternalActivityName = "slack.files.completeUploadExternal"
+
+	FilesUploadExternalActivityName = "slack.timpani.uploadExternal"
 )
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
@@ -18,6 +20,8 @@ type FilesGetUploadURLExternalRequest struct {
 
 	SnippetType string `json:"snippet_type,omitempty"`
 	AltText     string `json:"alt_text,omitempty"`
+
+	Content string `json:"content,omitempty"` // Used only by Timpani in [FilesUploadExternalActivity].
 }
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
@@ -29,16 +33,22 @@ type FilesGetUploadURLExternalResponse struct {
 }
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
-func FilesGetUploadURLExternalActivity(ctx workflow.Context, content []byte, name, snippetType, altText string) (string, error) {
-	req := FilesGetUploadURLExternalRequest{Length: len(content), Filename: name, SnippetType: snippetType, AltText: altText}
+func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, name, snippetType, altText string) (string, string, error) {
+	req := FilesGetUploadURLExternalRequest{Length: length, Filename: name, SnippetType: snippetType, AltText: altText}
 	fut := internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, req)
 
 	resp := new(FilesGetUploadURLExternalResponse)
-	if err := fut.Get(ctx, resp); err != nil { // Timpani also uploads [content] to [resp.UploadURL].
-		return "", err
+	if err := fut.Get(ctx, resp); err != nil {
+		return "", "", err
 	}
 
-	return resp.FileID, nil
+	return resp.FileID, resp.UploadURL, nil
+}
+
+// https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
+func FilesUploadExternalActivity(ctx workflow.Context, content, mimeType string) error {
+	req := FilesGetUploadURLExternalRequest{Content: content, SnippetType: mimeType}
+	return internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, req).Get(ctx, nil)
 }
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
