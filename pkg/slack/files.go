@@ -9,6 +9,8 @@ import (
 const (
 	FilesGetUploadURLExternalActivityName   = "slack.files.getUploadURLExternal"
 	FilesCompleteUploadExternalActivityName = "slack.files.completeUploadExternal"
+
+	TimpaniUploadExternalActivityName = "slack.timpani.uploadExternal"
 )
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
@@ -29,16 +31,16 @@ type FilesGetUploadURLExternalResponse struct {
 }
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
-func FilesGetUploadURLExternalActivity(ctx workflow.Context, content []byte, name, snippetType, altText string) (string, error) {
-	req := FilesGetUploadURLExternalRequest{Length: len(content), Filename: name, SnippetType: snippetType, AltText: altText}
+func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, name, snippetType, altText string) (string, string, error) {
+	req := FilesGetUploadURLExternalRequest{Length: length, Filename: name, SnippetType: snippetType, AltText: altText}
 	fut := internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, req)
 
 	resp := new(FilesGetUploadURLExternalResponse)
-	if err := fut.Get(ctx, resp); err != nil { // Timpani also uploads [content] to [resp.UploadURL].
-		return "", err
+	if err := fut.Get(ctx, resp); err != nil {
+		return "", "", err
 	}
 
-	return resp.FileID, nil
+	return resp.FileID, resp.UploadURL, nil
 }
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
@@ -63,6 +65,16 @@ type FilesCompleteUploadExternalResponse struct {
 func FilesCompleteUploadExternalActivity(ctx workflow.Context, fileID, title, channelID, threadTS string) error {
 	req := FilesCompleteUploadExternalRequest{Files: []File{{ID: fileID, Title: title}}, ChannelID: channelID, ThreadTS: threadTS}
 	return internal.ExecuteTimpaniActivity(ctx, FilesCompleteUploadExternalActivityName, req).Get(ctx, nil)
+}
+
+type TimpaniUploadExternalRequest struct {
+	Content  []byte `json:"content"`
+	MimeType string `json:"mime_type"`
+}
+
+func TimpaniUploadExternalActivity(ctx workflow.Context, content []byte, mimeType string) error {
+	req := TimpaniUploadExternalRequest{Content: content, MimeType: mimeType}
+	return internal.ExecuteTimpaniActivity(ctx, TimpaniUploadExternalActivityName, req).Get(ctx, nil)
 }
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
