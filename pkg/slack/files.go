@@ -61,19 +61,8 @@ type FilesCompleteUploadExternalResponse struct {
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
 func FilesCompleteUploadExternalActivity(ctx workflow.Context, fileID, title, channelID, threadTS string) error {
-	req := FilesCompleteUploadExternalRequest{
-		Files:     []File{{ID: fileID, Title: title}},
-		ChannelID: channelID,
-		ThreadTS:  threadTS,
-	}
-	fut := internal.ExecuteTimpaniActivity(ctx, FilesCompleteUploadExternalActivityName, req)
-
-	resp := new(FilesCompleteUploadExternalResponse)
-	if err := fut.Get(ctx, resp); err != nil {
-		return err
-	}
-
-	return nil
+	req := FilesCompleteUploadExternalRequest{Files: []File{{ID: fileID, Title: title}}, ChannelID: channelID, ThreadTS: threadTS}
+	return internal.ExecuteTimpaniActivity(ctx, FilesCompleteUploadExternalActivityName, req).Get(ctx, nil)
 }
 
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
