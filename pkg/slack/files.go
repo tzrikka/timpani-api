@@ -19,7 +19,7 @@ type FilesGetUploadURLExternalRequest struct {
 	Filename string `json:"filename"`
 
 	SnippetType string `json:"snippet_type,omitempty"`
-	AltText     string `json:"alt_text,omitempty"`
+	AltTxt      string `json:"alt_txt,omitempty"`
 }
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
@@ -31,8 +31,8 @@ type FilesGetUploadURLExternalResponse struct {
 }
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
-func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, name, snippetType, altText string) (string, string, error) {
-	req := FilesGetUploadURLExternalRequest{Length: length, Filename: name, SnippetType: snippetType, AltText: altText}
+func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, filename, snippetType, altTxt string) (string, string, error) {
+	req := FilesGetUploadURLExternalRequest{Length: length, Filename: filename, SnippetType: snippetType, AltTxt: altTxt}
 	fut := internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, req)
 
 	resp := new(FilesGetUploadURLExternalResponse)
