@@ -1,8 +1,6 @@
 package slack
 
 import (
-	"strconv"
-
 	"go.temporal.io/sdk/workflow"
 
 	"github.com/tzrikka/timpani-api/internal"
@@ -17,7 +15,7 @@ const (
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
 type FilesGetUploadURLExternalRequest struct {
-	Length   string `json:"length"` // Contrary to Slack's documentation, this has to be a string.
+	Length   int    `json:"length"`
 	Filename string `json:"filename"`
 
 	SnippetType string `json:"snippet_type,omitempty"`
@@ -34,12 +32,8 @@ type FilesGetUploadURLExternalResponse struct {
 
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
 func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, filename, snippetType, altTxt string) (string, string, error) {
-	fut := internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, FilesGetUploadURLExternalRequest{
-		Length:      strconv.Itoa(length), // Contrary to Slack's documentation, this has to be a string.
-		Filename:    filename,
-		SnippetType: snippetType,
-		AltTxt:      altTxt,
-	})
+	req := FilesGetUploadURLExternalRequest{Length: length, Filename: filename, SnippetType: snippetType, AltTxt: altTxt}
+	fut := internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, req)
 
 	resp := new(FilesGetUploadURLExternalResponse)
 	if err := fut.Get(ctx, resp); err != nil {
