@@ -11,6 +11,7 @@ const (
 	PullRequestsCreateCommentActivityName   = "bitbucket.pullrequests.createComment"
 	PullRequestsDeclineActivityName         = "bitbucket.pullrequests.decline"
 	PullRequestsDeleteCommentActivityName   = "bitbucket.pullrequests.deleteComment"
+	PullRequestsDiffStatActivityName        = "bitbucket.pullrequests.diffstat"
 	PullRequestsListActivityLogActivityName = "bitbucket.pullrequests.listActivityLog"
 	PullRequestsListCommitsActivityName     = "bitbucket.pullrequests.listCommits"
 	PullRequestsListForCommitActivityName   = "bitbucket.pullrequests.listForCommit"
@@ -103,6 +104,35 @@ type PullRequestsDeleteCommentRequest struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
 func PullRequestsDeleteCommentActivity(ctx workflow.Context, req PullRequestsDeleteCommentRequest) error {
 	return internal.ExecuteTimpaniActivity(ctx, PullRequestsDeleteCommentActivityName, req).Get(ctx, nil)
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-diffstat-get
+type PullRequestsDiffStatRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Workspace     string `json:"workspace"`
+	RepoSlug      string `json:"repo_slug"`
+	PullRequestID string `json:"pull_request_id"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen  string `json:"pagelen,omitempty"`
+	Page     string `json:"page,omitempty"`
+	AllPages bool   `json:"all_pages,omitempty"`
+}
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-diffstat-get
+type PullRequestsDiffStatResponse = CommitsDiffStatResponse
+
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-diffstat-get
+func PullRequestsDiffStatActivity(ctx workflow.Context, req PullRequestsDiffStatRequest) (*PullRequestsDiffStatResponse, error) {
+	fut := internal.ExecuteTimpaniActivity(ctx, PullRequestsDiffStatActivityName, req)
+
+	resp := new(PullRequestsDiffStatResponse)
+	if err := fut.Get(ctx, resp); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
