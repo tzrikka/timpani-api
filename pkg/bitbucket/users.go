@@ -10,34 +10,31 @@ const (
 	UsersGetActivityName = "bitbucket.users.get"
 )
 
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+// UsersGetRequest is based on:
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
 type UsersGetRequest struct {
 	AccountID string `json:"account_id,omitempty"`
 	UUID      string `json:"uuid,omitempty"`
 }
 
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
-type UsersGetResponse User
+// UsersGetResponse is based on:
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+type UsersGetResponse = User
 
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
-func UsersGetActivity(ctx workflow.Context, accountID, uuid string) (*UsersGetResponse, error) {
+// UsersGet is based on:
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+func UsersGet(ctx workflow.Context, accountID, uuid string) (*User, error) {
 	req := UsersGetRequest{AccountID: accountID, UUID: uuid}
-	fut := internal.ExecuteTimpaniActivity(ctx, UsersGetActivityName, req)
-
-	resp := new(UsersGetResponse)
-	if err := fut.Get(ctx, resp); err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return internal.ExecuteTimpaniActivity[UsersGetResponse](ctx, UsersGetActivityName, req)
 }
 
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
+// User is based on:
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type User struct {
 	Type string `json:"type"`
 

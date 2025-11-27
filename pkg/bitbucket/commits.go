@@ -8,9 +8,10 @@ import (
 
 const (
 	CommitsDiffActivityName     = "bitbucket.commits.diff"
-	CommitsDiffStatActivityName = "bitbucket.commits.diffstat"
+	CommitsDiffstatActivityName = "bitbucket.commits.diffstat"
 )
 
+// CommitsDiffRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
 type CommitsDiffRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
@@ -22,20 +23,19 @@ type CommitsDiffRequest struct {
 	Path string `json:"path,omitempty"`
 }
 
+// CommitsDiff is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
-func CommitsDiffActivity(ctx workflow.Context, req CommitsDiffRequest) (string, error) {
-	fut := internal.ExecuteTimpaniActivity(ctx, CommitsDiffActivityName, req)
-
-	resp := new(string)
-	if err := fut.Get(ctx, resp); err != nil {
+func CommitsDiff(ctx workflow.Context, req CommitsDiffRequest) (string, error) {
+	resp, err := internal.ExecuteTimpaniActivity[string](ctx, CommitsDiffActivityName, req)
+	if err != nil {
 		return "", err
 	}
-
 	return *resp, nil
 }
 
+// CommitsDiffstatRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
-type CommitsDiffStatRequest struct {
+type CommitsDiffstatRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
 	Workspace string `json:"workspace"`
@@ -49,36 +49,47 @@ type CommitsDiffStatRequest struct {
 	Path             string `json:"path,omitempty"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
-	PageLen  string `json:"pagelen,omitempty"`
-	Page     string `json:"page,omitempty"`
-	AllPages bool   `json:"all_pages,omitempty"`
-}
-
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
-type CommitsDiffStatResponse struct {
-	Values []DiffStat `json:"values"`
-
-	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
-	Size    int    `json:"size,omitempty"`
-	PageLen int    `json:"pagelen,omitempty"`
-	Page    int    `json:"page,omitempty"`
+	PageLen string `json:"pagelen,omitempty"`
+	Page    string `json:"page,omitempty"`
 	Next    string `json:"next,omitempty"`
 }
 
+// CommitsDiffstatResponse is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
-func CommitsDiffStatActivity(ctx workflow.Context, req CommitsDiffStatRequest) (*CommitsDiffStatResponse, error) {
-	fut := internal.ExecuteTimpaniActivity(ctx, CommitsDiffStatActivityName, req)
+type CommitsDiffstatResponse struct {
+	Values []Diffstat `json:"values"`
 
-	resp := new(CommitsDiffStatResponse)
-	if err := fut.Get(ctx, resp); err != nil {
-		return nil, err
-	}
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	Size    int `json:"size,omitempty"`
+	PageLen int `json:"pagelen,omitempty"`
+	Page    int `json:"page,omitempty"`
 
-	return resp, nil
+	Next string `json:"next,omitempty"`
 }
 
+// CommitsDiffstat is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
-type DiffStat struct {
+func CommitsDiffstat(ctx workflow.Context, req CommitsDiffstatRequest) ([]Diffstat, error) {
+	var ds []Diffstat
+	req.Next = "start"
+
+	for req.Next != "" {
+		req.Next = ""
+		resp, err := internal.ExecuteTimpaniActivity[CommitsDiffstatResponse](ctx, CommitsDiffstatActivityName, req)
+		if err != nil {
+			return nil, err
+		}
+
+		ds = append(ds, resp.Values...)
+		req.Next = resp.Next
+	}
+
+	return ds, nil
+}
+
+// Diffstat is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
+type Diffstat struct {
 	// Type string `json:"type"` // Always "diffstat".
 
 	Status string `json:"status"`
@@ -90,6 +101,7 @@ type DiffStat struct {
 	New *CommitFile `json:"new,omitempty"`
 }
 
+// CommitFile is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
 type CommitFile struct {
 	// Type string `json:"type"` // Always "commit_file".

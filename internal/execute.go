@@ -14,11 +14,23 @@ import (
 //
 // [Timpani worker]: https://pkg.go.dev/github.com/tzrikka/timpani
 // [activities]: https://pkg.go.dev/github.com/tzrikka/timpani/pkg/api
-func ExecuteTimpaniActivity(ctx workflow.Context, name string, req any) workflow.Future {
+func ExecuteTimpaniActivity[T any](ctx workflow.Context, name string, req any) (*T, error) {
 	opts := temporal.ActivityOptions
 	if opts == nil {
 		opts = temporal.DefaultActivityOptions("timpani")
 	}
 
-	return workflow.ExecuteActivity(workflow.WithActivityOptions(ctx, *opts), name, req)
+	resp := new(T)
+	err := workflow.ExecuteActivity(workflow.WithActivityOptions(ctx, *opts), name, req).Get(ctx, resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// ExecuteTimpaniActivityNoResp is a convenience wrapper around
+// [ExecuteTimpaniActivity] for activities that do not return a response.
+func ExecuteTimpaniActivityNoResp(ctx workflow.Context, name string, req any) error {
+	_, err := ExecuteTimpaniActivity[any](ctx, name, req)
+	return err
 }

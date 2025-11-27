@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	FilesGetUploadURLExternalActivityName   = "slack.files.getUploadURLExternal"
 	FilesCompleteUploadExternalActivityName = "slack.files.completeUploadExternal"
+	FilesGetUploadURLExternalActivityName   = "slack.files.getUploadURLExternal"
 
 	TimpaniUploadExternalActivityName = "slack.timpani.uploadExternal"
 )
 
+// FilesGetUploadURLExternalRequest is based on:
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
 type FilesGetUploadURLExternalRequest struct {
 	Length   int    `json:"length"`
@@ -22,6 +23,7 @@ type FilesGetUploadURLExternalRequest struct {
 	AltTxt      string `json:"alt_txt,omitempty"`
 }
 
+// FilesGetUploadURLExternalResponse is based on:
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
 type FilesGetUploadURLExternalResponse struct {
 	Response
@@ -30,19 +32,18 @@ type FilesGetUploadURLExternalResponse struct {
 	FileID    string `json:"file_id,omitempty"`
 }
 
+// FilesGetUploadURLExternal is based on:
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/
-func FilesGetUploadURLExternalActivity(ctx workflow.Context, length int, filename, snippetType, altTxt string) (string, string, error) {
+func FilesGetUploadURLExternal(ctx workflow.Context, length int, filename, snippetType, altTxt string) (string, string, error) {
 	req := FilesGetUploadURLExternalRequest{Length: length, Filename: filename, SnippetType: snippetType, AltTxt: altTxt}
-	fut := internal.ExecuteTimpaniActivity(ctx, FilesGetUploadURLExternalActivityName, req)
-
-	resp := new(FilesGetUploadURLExternalResponse)
-	if err := fut.Get(ctx, resp); err != nil {
+	resp, err := internal.ExecuteTimpaniActivity[FilesGetUploadURLExternalResponse](ctx, FilesGetUploadURLExternalActivityName, req)
+	if err != nil {
 		return "", "", err
 	}
-
 	return resp.UploadURL, resp.FileID, nil
 }
 
+// FilesCompleteUploadExternalRequest is based on:
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
 type FilesCompleteUploadExternalRequest struct {
 	Files []File `json:"files"`
@@ -54,6 +55,7 @@ type FilesCompleteUploadExternalRequest struct {
 	Blocks         string `json:"blocks,omitempty"`
 }
 
+// FilesCompleteUploadExternalResponse is based on:
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
 type FilesCompleteUploadExternalResponse struct {
 	Response
@@ -61,26 +63,32 @@ type FilesCompleteUploadExternalResponse struct {
 	Files []File `json:"files,omitempty"`
 }
 
+// FilesCompleteUploadExternal is based on:
 // https://docs.slack.dev/reference/methods/files.completeuploadexternal/
-func FilesCompleteUploadExternalActivity(ctx workflow.Context, req FilesCompleteUploadExternalRequest) ([]File, error) {
-	resp := new(FilesCompleteUploadExternalResponse)
-	if err := internal.ExecuteTimpaniActivity(ctx, FilesCompleteUploadExternalActivityName, req).Get(ctx, resp); err != nil {
+func FilesCompleteUploadExternal(ctx workflow.Context, req FilesCompleteUploadExternalRequest) ([]File, error) {
+	resp, err := internal.ExecuteTimpaniActivity[FilesCompleteUploadExternalResponse](ctx, FilesCompleteUploadExternalActivityName, req)
+	if err != nil {
 		return nil, err
 	}
 	return resp.Files, nil
 }
 
+// TimpaniUploadExternalRequest is based on:
+// https://docs.slack.dev/messaging/working-with-files/
 type TimpaniUploadExternalRequest struct {
 	URL      string `json:"url"`
 	MimeType string `json:"mime_type"`
 	Content  []byte `json:"content"`
 }
 
-func TimpaniUploadExternalActivity(ctx workflow.Context, url, mimeType string, content []byte) error {
+// TimpaniUploadExternal is based on:
+// https://docs.slack.dev/messaging/working-with-files/
+func TimpaniUploadExternal(ctx workflow.Context, url, mimeType string, content []byte) error {
 	req := TimpaniUploadExternalRequest{URL: url, MimeType: mimeType, Content: content}
-	return internal.ExecuteTimpaniActivity(ctx, TimpaniUploadExternalActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, TimpaniUploadExternalActivityName, req)
 }
 
+// File is based on:
 // https://docs.slack.dev/reference/objects/file-object/#types
 type File struct {
 	ID    string `json:"id,omitempty"`
@@ -128,6 +136,8 @@ type File struct {
 	Shares map[string]map[string][]FileShare `json:"shares,omitempty"` // "private"/"public" -> channel ID -> []FileShare.
 }
 
+// FileShare is based on:
+// https://docs.slack.dev/reference/objects/file-object/#types
 type FileShare struct {
 	ChannelName string `json:"channel_name,omitempty"`
 	ShareUserID string `json:"share_user_id,omitempty"`

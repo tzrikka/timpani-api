@@ -10,6 +10,7 @@ const (
 	AuthTestActivityName = "slack.auth.test"
 )
 
+// AuthTestResponse is based on:
 // https://docs.slack.dev/reference/methods/auth.test/
 type AuthTestResponse struct {
 	Response
@@ -24,12 +25,8 @@ type AuthTestResponse struct {
 	IsEnterpriseInstall bool   `json:"is_enterprise_install,omitempty"`
 }
 
+// AuthTest is based on:
 // https://docs.slack.dev/reference/methods/auth.test/
-func AuthTestActivity(ctx workflow.Context) (*AuthTestResponse, error) {
-	resp := new(AuthTestResponse)
-	err := internal.ExecuteTimpaniActivity(ctx, AuthTestActivityName, nil).Get(ctx, resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+func AuthTest(ctx workflow.Context) (*AuthTestResponse, error) {
+	return internal.ExecuteTimpaniActivity[AuthTestResponse](ctx, AuthTestActivityName, nil)
 }

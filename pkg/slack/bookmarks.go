@@ -13,6 +13,7 @@ const (
 	BookmarksRemoveActivityName = "slack.bookmarks.remove"
 )
 
+// BookmarksAddRequest is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.add/
 type BookmarksAddRequest struct {
 	ChannelID string `json:"channel_id"`
@@ -26,6 +27,7 @@ type BookmarksAddRequest struct {
 	ParentID    string `json:"parent_id,omitempty"`
 }
 
+// BookmarksAddResponse is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.add/
 type BookmarksAddResponse struct {
 	Response
@@ -33,12 +35,14 @@ type BookmarksAddResponse struct {
 	Bookmark *Bookmark `json:"bookmark,omitempty"`
 }
 
+// BookmarksAdd is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.add/
-func BookmarksAddActivity(ctx workflow.Context, channelID, title, url, emoji string) error {
+func BookmarksAdd(ctx workflow.Context, channelID, title, url, emoji string) error {
 	req := BookmarksAddRequest{ChannelID: channelID, Title: title, Type: "link", Link: url, Emoji: emoji}
-	return internal.ExecuteTimpaniActivity(ctx, BookmarksAddActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, BookmarksAddActivityName, req)
 }
 
+// BookmarksEditRequest is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.edit/
 type BookmarksEditRequest struct {
 	ChannelID  string `json:"channel_id"`
@@ -49,6 +53,7 @@ type BookmarksEditRequest struct {
 	Emoji string `json:"emoji,omitempty"`
 }
 
+// BookmarksEditResponse is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.edit/
 type BookmarksEditResponse struct {
 	Response
@@ -56,17 +61,20 @@ type BookmarksEditResponse struct {
 	Bookmark *Bookmark `json:"bookmark,omitempty"`
 }
 
+// BookmarksEditTitle is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.edit/
-func BookmarksEditTitleActivity(ctx workflow.Context, channelID, bookmarkID, title string) error {
+func BookmarksEditTitle(ctx workflow.Context, channelID, bookmarkID, title string) error {
 	req := BookmarksEditRequest{ChannelID: channelID, BookmarkID: bookmarkID, Title: title}
-	return internal.ExecuteTimpaniActivity(ctx, BookmarksEditActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, BookmarksEditActivityName, req)
 }
 
+// BookmarksListRequest is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.list/
 type BookmarksListRequest struct {
 	ChannelID string `json:"channel_id"`
 }
 
+// BookmarksListResponse is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.list/
 type BookmarksListResponse struct {
 	Response
@@ -74,19 +82,18 @@ type BookmarksListResponse struct {
 	Bookmarks []Bookmark `json:"bookmarks,omitempty"`
 }
 
+// BookmarksList is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.list/
-func BookmarksListActivity(ctx workflow.Context, channelID string) ([]Bookmark, error) {
+func BookmarksList(ctx workflow.Context, channelID string) ([]Bookmark, error) {
 	req := BookmarksListRequest{ChannelID: channelID}
-	fut := internal.ExecuteTimpaniActivity(ctx, BookmarksListActivityName, req)
-
-	resp := new(BookmarksListResponse)
-	if err := fut.Get(ctx, resp); err != nil {
+	resp, err := internal.ExecuteTimpaniActivity[BookmarksListResponse](ctx, BookmarksListActivityName, req)
+	if err != nil {
 		return nil, err
 	}
-
 	return resp.Bookmarks, nil
 }
 
+// BookmarksRemoveRequest is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.remove/
 type BookmarksRemoveRequest struct {
 	ChannelID  string `json:"channel_id"`
@@ -95,13 +102,15 @@ type BookmarksRemoveRequest struct {
 	QuipSectionID string `json:"quip_section_id,omitempty"`
 }
 
+// BookmarksRemoveResponse is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.remove/
 type BookmarksRemoveResponse Response
 
+// BookmarksRemove is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.remove/
-func BookmarksRemoveActivity(ctx workflow.Context, channelID, bookmarkID string) error {
+func BookmarksRemove(ctx workflow.Context, channelID, bookmarkID string) error {
 	req := BookmarksRemoveRequest{ChannelID: channelID, BookmarkID: bookmarkID}
-	return internal.ExecuteTimpaniActivity(ctx, BookmarksRemoveActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, BookmarksRemoveActivityName, req)
 }
 
 type Bookmark struct {

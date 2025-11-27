@@ -13,6 +13,7 @@ const (
 	ReactionsRemoveActivityName = "slack.reactions.remove"
 )
 
+// ReactionsAddRequest is based on:
 // https://docs.slack.dev/reference/methods/reactions.add/
 type ReactionsAddRequest struct {
 	Channel   string `json:"channel"`
@@ -20,17 +21,20 @@ type ReactionsAddRequest struct {
 	Name      string `json:"name"`
 }
 
+// ReactionsAddResponse is based on:
 // https://docs.slack.dev/reference/methods/reactions.add/
 type ReactionsAddResponse struct {
 	Response
 }
 
+// ReactionsAdd is based on:
 // https://docs.slack.dev/reference/methods/reactions.add/
-func ReactionsAddActivity(ctx workflow.Context, channelID, timestamp, name string) error {
+func ReactionsAdd(ctx workflow.Context, channelID, timestamp, name string) error {
 	req := ReactionsAddRequest{Channel: channelID, Timestamp: timestamp, Name: name}
-	return internal.ExecuteTimpaniActivity(ctx, ReactionsAddActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, ReactionsAddActivityName, req)
 }
 
+// ReactionsGetRequest is based on:
 // https://docs.slack.dev/reference/methods/reactions.get/
 type ReactionsGetRequest struct {
 	Channel     string `json:"channel,omitempty"`
@@ -40,6 +44,7 @@ type ReactionsGetRequest struct {
 	Full        bool   `json:"full,omitempty"`
 }
 
+// ReactionsGetResponse is based on:
 // https://docs.slack.dev/reference/methods/reactions.get/
 type ReactionsGetResponse struct {
 	Response
@@ -51,19 +56,18 @@ type ReactionsGetResponse struct {
 	Channel     string         `json:"channel,omitempty"`
 }
 
+// ReactionsGet is based on:
 // https://docs.slack.dev/reference/methods/reactions.get/
-func ReactionsGetActivity(ctx workflow.Context, channelID, timestamp string) (map[string]any, error) {
+func ReactionsGet(ctx workflow.Context, channelID, timestamp string) (map[string]any, error) {
 	req := ReactionsGetRequest{Channel: channelID, Timestamp: timestamp, Full: true}
-	fut := internal.ExecuteTimpaniActivity(ctx, ReactionsGetActivityName, req)
-
-	resp := new(ReactionsGetResponse)
-	if err := fut.Get(ctx, resp); err != nil {
+	resp, err := internal.ExecuteTimpaniActivity[ReactionsGetResponse](ctx, ReactionsGetActivityName, req)
+	if err != nil {
 		return nil, err
 	}
-
 	return resp.Message, nil
 }
 
+// ReactionsListRequest is based on:
 // https://docs.slack.dev/reference/methods/reactions.list/
 type ReactionsListRequest struct {
 	User string `json:"user,omitempty"`
@@ -77,6 +81,7 @@ type ReactionsListRequest struct {
 	TeamID string `json:"team_id,omitempty"`
 }
 
+// ReactionsListResponse is based on:
 // https://docs.slack.dev/reference/methods/reactions.list/
 type ReactionsListResponse struct {
 	Response
@@ -84,6 +89,7 @@ type ReactionsListResponse struct {
 	Items []map[string]any `json:"items,omitempty"`
 }
 
+// ReactionsRemoveRequest is based on:
 // https://docs.slack.dev/reference/methods/reactions.remove/
 type ReactionsRemoveRequest struct {
 	Name string `json:"name"`
@@ -94,11 +100,13 @@ type ReactionsRemoveRequest struct {
 	FileComment string `json:"file_comment,omitempty"`
 }
 
+// ReactionsRemoveResponse is based on:
 // https://docs.slack.dev/reference/methods/reactions.remove/
 type ReactionsRemoveResponse Response
 
+// ReactionsRemove is based on:
 // https://docs.slack.dev/reference/methods/reactions.remove/
-func ReactionsRemoveActivity(ctx workflow.Context, channelID, timestamp, name string) error {
+func ReactionsRemove(ctx workflow.Context, channelID, timestamp, name string) error {
 	req := ReactionsRemoveRequest{Channel: channelID, Timestamp: timestamp, Name: name}
-	return internal.ExecuteTimpaniActivity(ctx, ReactionsRemoveActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, ReactionsRemoveActivityName, req)
 }

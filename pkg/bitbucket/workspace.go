@@ -12,12 +12,14 @@ const (
 	WorkspacesListMembersActivityName = "bitbucket.workspaces.listMembers"
 )
 
+// WorkspacesListMembersRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type WorkspacesListMembersRequest struct {
 	Workspace    string   `json:"workspace"`
 	EmailsFilter []string `json:"emails_filter"`
 }
 
+// WorkspacesListMembersResponse is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type WorkspacesListMembersResponse struct {
 	Values []Membership `json:"values,omitempty"`
@@ -28,13 +30,12 @@ type WorkspacesListMembersResponse struct {
 	Next    string `json:"next,omitempty"`
 }
 
+// WorkspacesListMembers is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
-func WorkspacesListMembersActivity(ctx workflow.Context, workspace string, emailsFilter []string) ([]User, error) {
+func WorkspacesListMembers(ctx workflow.Context, workspace string, emailsFilter []string) ([]User, error) {
 	req := WorkspacesListMembersRequest{Workspace: workspace, EmailsFilter: emailsFilter}
-	fut := internal.ExecuteTimpaniActivity(ctx, WorkspacesListMembersActivityName, req)
-
-	resp := new(WorkspacesListMembersResponse)
-	if err := fut.Get(ctx, resp); err != nil {
+	resp, err := internal.ExecuteTimpaniActivity[WorkspacesListMembersResponse](ctx, WorkspacesListMembersActivityName, req)
+	if err != nil {
 		return nil, err
 	}
 
@@ -52,10 +53,10 @@ func WorkspacesListMembersActivity(ctx workflow.Context, workspace string, email
 
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type Membership struct {
-	// Type  string `json:"type"`           // Always "workspace_membership".
-	// Links map[string]Link `json:"links"` // Unnecessary.
+	// Type  string `json:"type"` // Always "workspace_membership".
 
 	User User `json:"user"`
 
-	// Workspace // Unnecessary.
+	// Workspace                            // Unnecessary.
+	// Links map[string]Link `json:"links"` // Unnecessary.
 }

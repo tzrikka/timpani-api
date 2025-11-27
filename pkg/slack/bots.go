@@ -10,6 +10,7 @@ const (
 	BotsInfoActivityName = "slack.bots.info"
 )
 
+// BotsInfoRequest is based on:
 // https://docs.slack.dev/reference/methods/bots.info/
 type BotsInfoRequest struct {
 	Bot string `json:"bot"`
@@ -17,6 +18,7 @@ type BotsInfoRequest struct {
 	TeamID string `json:"team_id,omitempty"`
 }
 
+// BotsInfoResponse is based on:
 // https://docs.slack.dev/reference/methods/bots.info/
 type BotsInfoResponse struct {
 	Response
@@ -24,6 +26,7 @@ type BotsInfoResponse struct {
 	Bot *Bot `json:"bot,omitempty"`
 }
 
+// Bot is based on:
 // https://docs.slack.dev/reference/methods/bots.info/
 type Bot struct {
 	ID      string `json:"id"`
@@ -35,15 +38,13 @@ type Bot struct {
 	Updated int64  `json:"updated"`
 }
 
+// BotsInfo is based on:
 // https://docs.slack.dev/reference/methods/bots.info/
-func BotsInfoActivity(ctx workflow.Context, botID string) (*Bot, error) {
+func BotsInfo(ctx workflow.Context, botID string) (*Bot, error) {
 	req := BotsInfoRequest{Bot: botID}
-	fut := internal.ExecuteTimpaniActivity(ctx, BotsInfoActivityName, req)
-
-	resp := new(BotsInfoResponse)
-	if err := fut.Get(ctx, resp); err != nil {
+	resp, err := internal.ExecuteTimpaniActivity[BotsInfoResponse](ctx, BotsInfoActivityName, req)
+	if err != nil {
 		return nil, err
 	}
-
 	return resp.Bot, nil
 }

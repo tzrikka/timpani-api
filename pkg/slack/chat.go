@@ -16,6 +16,7 @@ const (
 	TimpaniPostApprovalWorkflowName = "slack.timpani.postApproval"
 )
 
+// ChatDeleteRequest is based on:
 // https://docs.slack.dev/reference/methods/chat.delete/
 type ChatDeleteRequest struct {
 	Channel string `json:"channel"`
@@ -24,6 +25,7 @@ type ChatDeleteRequest struct {
 	AsUser bool `json:"as_user,omitempty"`
 }
 
+// ChatDeleteResponse is based on:
 // https://docs.slack.dev/reference/methods/chat.delete/
 type ChatDeleteResponse struct {
 	Response
@@ -32,18 +34,21 @@ type ChatDeleteResponse struct {
 	TS      string `json:"ts,omitempty"`
 }
 
+// ChatDelete is based on:
 // https://docs.slack.dev/reference/methods/chat.delete/
-func ChatDeleteActivity(ctx workflow.Context, channelID, timestamp string) error {
+func ChatDelete(ctx workflow.Context, channelID, timestamp string) error {
 	req := ChatDeleteRequest{Channel: channelID, TS: timestamp}
-	return internal.ExecuteTimpaniActivity(ctx, ChatDeleteActivityName, req).Get(ctx, nil)
+	return internal.ExecuteTimpaniActivityNoResp(ctx, ChatDeleteActivityName, req)
 }
 
+// ChatGetPermalinkRequest is based on:
 // https://docs.slack.dev/reference/methods/chat.getPermalink/
 type ChatGetPermalinkRequest struct {
 	Channel   string `json:"channel"`
 	MessageTS string `json:"message_ts"`
 }
 
+// ChatGetPermalinkResponse is based on:
 // https://docs.slack.dev/reference/methods/chat.getPermalink/
 type ChatGetPermalinkResponse struct {
 	Response
@@ -52,19 +57,18 @@ type ChatGetPermalinkResponse struct {
 	Permalink string `json:"permalink,omitempty"`
 }
 
+// ChatGetPermalink is based on:
 // https://docs.slack.dev/reference/methods/chat.getPermalink/
-func ChatGetPermalinkActivity(ctx workflow.Context, channelID, timestamp string) (string, error) {
+func ChatGetPermalink(ctx workflow.Context, channelID, timestamp string) (string, error) {
 	req := ChatGetPermalinkRequest{Channel: channelID, MessageTS: timestamp}
-	fut := internal.ExecuteTimpaniActivity(ctx, ChatGetPermalinkActivityName, req)
-
-	resp := new(ChatGetPermalinkResponse)
-	if err := fut.Get(ctx, resp); err != nil {
+	resp, err := internal.ExecuteTimpaniActivity[ChatGetPermalinkResponse](ctx, ChatGetPermalinkActivityName, req)
+	if err != nil {
 		return "", err
 	}
-
 	return resp.Permalink, nil
 }
 
+// ChatPostEphemeralRequest is based on:
 // https://docs.slack.dev/reference/methods/chat.postEphemeral/
 type ChatPostEphemeralRequest struct {
 	Channel string `json:"channel"`
@@ -85,6 +89,7 @@ type ChatPostEphemeralRequest struct {
 	Username  string `json:"username,omitempty"`
 }
 
+// ChatPostEphemeralResponse is based on:
 // https://docs.slack.dev/reference/methods/chat.postEphemeral/
 type ChatPostEphemeralResponse struct {
 	Response
@@ -92,11 +97,13 @@ type ChatPostEphemeralResponse struct {
 	MessageTS string `json:"message_ts,omitempty"`
 }
 
+// ChatPostEphemeral is based on:
 // https://docs.slack.dev/reference/methods/chat.postEphemeral/
-func ChatPostEphemeralActivity(ctx workflow.Context, req ChatPostEphemeralRequest) error {
-	return internal.ExecuteTimpaniActivity(ctx, ChatPostEphemeralActivityName, req).Get(ctx, nil)
+func ChatPostEphemeral(ctx workflow.Context, req ChatPostEphemeralRequest) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, ChatPostEphemeralActivityName, req)
 }
 
+// ChatPostMessageRequest is based on:
 // https://docs.slack.dev/reference/methods/chat.postMessage/
 type ChatPostMessageRequest struct {
 	Channel string `json:"channel"`
@@ -122,6 +129,7 @@ type ChatPostMessageRequest struct {
 	UnfurlMedia bool   `json:"unfurl_media,omitempty"`
 }
 
+// ChatPostMessageResponse is based on:
 // https://docs.slack.dev/reference/methods/chat.postMessage/
 type ChatPostMessageResponse struct {
 	Response
@@ -131,18 +139,13 @@ type ChatPostMessageResponse struct {
 	Message map[string]any `json:"message,omitempty"`
 }
 
+// ChatPostMessage is based on:
 // https://docs.slack.dev/reference/methods/chat.postMessage/
-func ChatPostMessageActivity(ctx workflow.Context, req ChatPostMessageRequest) (*ChatPostMessageResponse, error) {
-	fut := internal.ExecuteTimpaniActivity(ctx, ChatPostMessageActivityName, req)
-
-	resp := new(ChatPostMessageResponse)
-	if err := fut.Get(ctx, resp); err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+func ChatPostMessage(ctx workflow.Context, req ChatPostMessageRequest) (*ChatPostMessageResponse, error) {
+	return internal.ExecuteTimpaniActivity[ChatPostMessageResponse](ctx, ChatPostMessageActivityName, req)
 }
 
+// ChatUpdateRequest is based on:
 // https://docs.slack.dev/reference/methods/chat.update/
 type ChatUpdateRequest struct {
 	Channel string `json:"channel"`
@@ -162,6 +165,7 @@ type ChatUpdateRequest struct {
 	Parse     string `json:"parse,omitempty"`
 }
 
+// ChatUpdateResponse is based on:
 // https://docs.slack.dev/reference/methods/chat.update/
 type ChatUpdateResponse struct {
 	Response
@@ -172,9 +176,10 @@ type ChatUpdateResponse struct {
 	Message map[string]any `json:"message,omitempty"`
 }
 
+// ChatUpdate is based on:
 // https://docs.slack.dev/reference/methods/chat.update/
-func ChatUpdateActivity(ctx workflow.Context, req ChatUpdateRequest) error {
-	return internal.ExecuteTimpaniActivity(ctx, ChatUpdateActivityName, req).Get(ctx, nil)
+func ChatUpdate(ctx workflow.Context, req ChatUpdateRequest) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, ChatUpdateActivityName, req)
 }
 
 // TimpaniPostApprovalRequest is similar to [ChatPostMessageRequest]. If button
@@ -200,13 +205,11 @@ type TimpaniPostApprovalResponse struct {
 	InteractionEvent map[string]any `json:"interaction_event,omitempty"`
 }
 
-// TimpaniPostApprovalWorkflow is a convenience wrapper over
-// [ChatPostMessageActivity]. It sends an interactive message to a
-// user/group/channel with a short header, a markdown message, and
-// 2 buttons. It then waits for (and returns) the user selection.
+// TimpaniPostApprovalWorkflow is a convenience wrapper over [ChatPostMessage].
+// It sends an interactive message to a user/group/channel with a short header,
+// a markdown message, and 2 buttons. It then waits for (and returns) the user selection.
 //
-// For message formatting tips, see
-// https://docs.slack.dev/messaging/formatting-message-text.
+// For message formatting tips, see https://docs.slack.dev/messaging/formatting-message-text.
 func TimpaniPostApprovalWorkflow(ctx workflow.Context, req TimpaniPostApprovalRequest) (map[string]any, error) {
 	resp := new(TimpaniPostApprovalResponse)
 	fut := workflow.ExecuteChildWorkflow(ctx, TimpaniPostApprovalWorkflowName, req)

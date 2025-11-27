@@ -10,6 +10,7 @@ const (
 	SourceGetFileActivityName = "bitbucket.source.getFile"
 )
 
+// SourceGetRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
 type SourceGetRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
@@ -24,19 +25,18 @@ type SourceGetRequest struct {
 	Sort   string `json:"sort,omitempty"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
-	PageLen  string `json:"pagelen,omitempty"`
-	Page     string `json:"page,omitempty"`
-	AllPages bool   `json:"all_pages,omitempty"`
+	PageLen string `json:"pagelen,omitempty"`
+	Page    string `json:"page,omitempty"`
+
+	Next string `json:"next,omitempty"`
 }
 
+// SourceGetFile is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
-func SourceGetFileActivity(ctx workflow.Context, req SourceGetRequest) (string, error) {
-	fut := internal.ExecuteTimpaniActivity(ctx, SourceGetFileActivityName, req)
-
-	resp := new(string)
-	if err := fut.Get(ctx, resp); err != nil {
+func SourceGetFile(ctx workflow.Context, req SourceGetRequest) (string, error) {
+	resp, err := internal.ExecuteTimpaniActivity[string](ctx, SourceGetFileActivityName, req)
+	if err != nil {
 		return "", err
 	}
-
 	return *resp, nil
 }
