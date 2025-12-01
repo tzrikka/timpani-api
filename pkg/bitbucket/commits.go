@@ -74,7 +74,10 @@ func CommitsDiffstat(ctx workflow.Context, req CommitsDiffstatRequest) ([]Diffst
 	req.Next = "start"
 
 	for req.Next != "" {
-		req.Next = ""
+		if req.Next == "start" {
+			req.Next = ""
+		}
+
 		resp, err := internal.ExecuteTimpaniActivity[CommitsDiffstatResponse](ctx, CommitsDiffstatActivityName, req)
 		if err != nil {
 			return nil, err

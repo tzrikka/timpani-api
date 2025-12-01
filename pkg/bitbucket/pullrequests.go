@@ -135,7 +135,10 @@ func PullRequestsDiffstat(ctx workflow.Context, req PullRequestsDiffstatRequest)
 	req.Next = "start"
 
 	for req.Next != "" {
-		req.Next = ""
+		if req.Next == "start" {
+			req.Next = ""
+		}
+
 		resp, err := internal.ExecuteTimpaniActivity[PullRequestsDiffstatResponse](ctx, PullRequestsDiffstatActivityName, req)
 		if err != nil {
 			return nil, err
@@ -181,7 +184,10 @@ func PullRequestsListActivityLog(ctx workflow.Context, req PullRequestsListActiv
 	req.Next = "start"
 
 	for req.Next != "" {
-		req.Next = ""
+		if req.Next == "start" {
+			req.Next = ""
+		}
+
 		resp, err := internal.ExecuteTimpaniActivity[PullRequestsListActivityLogResponse](ctx, PullRequestsListActivityLogActivityName, req)
 		if err != nil {
 			return nil, err
@@ -228,7 +234,10 @@ func PullRequestsListCommits(ctx workflow.Context, req PullRequestsListCommitsRe
 	req.Next = "start"
 
 	for req.Next != "" {
-		req.Next = ""
+		if req.Next == "start" {
+			req.Next = ""
+		}
+
 		resp, err := internal.ExecuteTimpaniActivity[PullRequestsListCommitsResponse](ctx, PullRequestsListCommitsActivityName, req)
 		if err != nil {
 			return nil, err
@@ -275,7 +284,10 @@ func PullRequestsListForCommit(ctx workflow.Context, req PullRequestsListForComm
 	req.Next = "start"
 
 	for req.Next != "" {
-		req.Next = ""
+		if req.Next == "start" {
+			req.Next = ""
+		}
+
 		resp, err := internal.ExecuteTimpaniActivity[PullRequestsListForCommitResponse](ctx, PullRequestsListForCommitActivityName, req)
 		if err != nil {
 			return nil, err
