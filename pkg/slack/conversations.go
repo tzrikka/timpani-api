@@ -198,9 +198,7 @@ type ConversationsKickRequest struct {
 
 // ConversationsKickResponse is based on:
 // https://docs.slack.dev/reference/methods/conversations.kick/
-type ConversationsKickResponse struct {
-	Response
-}
+type ConversationsKickResponse Response
 
 // ConversationsKick is based on:
 // https://docs.slack.dev/reference/methods/conversations.kick/

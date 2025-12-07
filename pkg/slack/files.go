@@ -9,6 +9,7 @@ import (
 //revive:disable:exported
 const (
 	FilesCompleteUploadExternalActivityName = "slack.files.completeUploadExternal"
+	FilesDeleteActivityName                 = "slack.files.delete"
 	FilesGetUploadURLExternalActivityName   = "slack.files.getUploadURLExternal"
 
 	TimpaniUploadExternalActivityName = "slack.timpani.uploadExternal"
@@ -72,6 +73,22 @@ func FilesCompleteUploadExternal(ctx workflow.Context, req FilesCompleteUploadEx
 		return nil, err
 	}
 	return resp.Files, nil
+}
+
+// FilesDeleteRequest is based on:
+// https://docs.slack.dev/reference/methods/files.delete/
+type FilesDeleteRequest struct {
+	File string `json:"file"`
+}
+
+// FilesDeleteResponse is based on:
+// https://docs.slack.dev/reference/methods/files.delete/
+type FilesDeleteResponse Response
+
+// FilesDelete is based on:
+// https://docs.slack.dev/reference/methods/files.delete/
+func FilesDelete(ctx workflow.Context, file string) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, FilesDeleteActivityName, FilesDeleteRequest{File: file})
 }
 
 // TimpaniUploadExternalRequest is based on:

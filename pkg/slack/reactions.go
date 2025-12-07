@@ -24,9 +24,7 @@ type ReactionsAddRequest struct {
 
 // ReactionsAddResponse is based on:
 // https://docs.slack.dev/reference/methods/reactions.add/
-type ReactionsAddResponse struct {
-	Response
-}
+type ReactionsAddResponse Response
 
 // ReactionsAdd is based on:
 // https://docs.slack.dev/reference/methods/reactions.add/
