@@ -384,13 +384,3 @@ type Parent struct {
 	ID    int             `json:"id"`
 	Links map[string]Link `json:"links"`
 }
-
-// Rendered is based on:
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-get
-// type Rendered struct {
-// 	// Type string `json:"type"` // Always "rendered".
-//
-// 	Raw    string `json:"raw"`
-// 	Markup string `json:"markup"`
-// 	HTML   string `json:"html"`
-// }.
