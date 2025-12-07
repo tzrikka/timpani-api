@@ -6,6 +6,7 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	UsersConversationsActivityName = "slack.users.conversations"
 	UsersGetPresenceActivityName   = "slack.users.getPresence"
@@ -13,7 +14,7 @@ const (
 	UsersListActivityName          = "slack.users.list"
 	UsersLookupByEmailActivityName = "slack.users.lookupByEmail"
 	UsersProfileGetActivityName    = "slack.users.profile.get"
-)
+) //revive:enable:exported
 
 // UsersConversationsRequest is based on:
 // https://docs.slack.dev/reference/methods/users.conversations/

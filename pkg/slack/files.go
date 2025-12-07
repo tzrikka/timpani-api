@@ -6,12 +6,13 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	FilesCompleteUploadExternalActivityName = "slack.files.completeUploadExternal"
 	FilesGetUploadURLExternalActivityName   = "slack.files.getUploadURLExternal"
 
 	TimpaniUploadExternalActivityName = "slack.timpani.uploadExternal"
-)
+) //revive:enable:exported
 
 // FilesGetUploadURLExternalRequest is based on:
 // https://docs.slack.dev/reference/methods/files.getuploadurlexternal/

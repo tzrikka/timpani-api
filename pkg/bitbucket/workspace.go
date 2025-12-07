@@ -8,9 +8,10 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	WorkspacesListMembersActivityName = "bitbucket.workspaces.listMembers"
-)
+) //revive:enable:exported
 
 // WorkspacesListMembersRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
@@ -51,6 +52,7 @@ func WorkspacesListMembers(ctx workflow.Context, workspace string, emailsFilter 
 	return users, nil
 }
 
+// Membership is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
 type Membership struct {
 	// Type  string `json:"type"` // Always "workspace_membership".

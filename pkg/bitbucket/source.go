@@ -6,9 +6,10 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	SourceGetFileActivityName = "bitbucket.source.getFile"
-)
+) //revive:enable:exported
 
 // SourceGetRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get

@@ -6,6 +6,7 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	ChatDeleteActivityName        = "slack.chat.delete"
 	ChatGetPermalinkActivityName  = "slack.chat.getPermalink"
@@ -14,7 +15,7 @@ const (
 	ChatUpdateActivityName        = "slack.chat.update"
 
 	TimpaniPostApprovalWorkflowName = "slack.timpani.postApproval"
-)
+) //revive:enable:exported
 
 // ChatDeleteRequest is based on:
 // https://docs.slack.dev/reference/methods/chat.delete/
@@ -199,6 +200,8 @@ type TimpaniPostApprovalRequest struct {
 	Timeout string `json:"timeout,omitempty"`
 }
 
+// TimpaniPostApprovalResponse is based on:
+// https://docs.slack.dev/reference/interaction-payloads/
 type TimpaniPostApprovalResponse struct {
 	Response
 

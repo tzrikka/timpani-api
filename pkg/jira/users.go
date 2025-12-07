@@ -6,10 +6,11 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	UsersGetActivityName    = "jira.users.get"
 	UsersSearchActivityName = "jira.users.search"
-)
+) //revive:enable:exported
 
 // UsersGetRequest is based on:
 // https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
@@ -28,11 +29,13 @@ func UsersGet(ctx workflow.Context, accountID string) (*User, error) {
 	return internal.ExecuteTimpaniActivity[UsersGetResponse](ctx, UsersGetActivityName, req)
 }
 
+// UsersSearchRequest is based on:
 // https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
 type UsersSearchRequest struct {
 	Query string `json:"query"`
 }
 
+// UsersSearchActivity is based on:
 // https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
 func UsersSearchActivity(ctx workflow.Context, query string) ([]User, error) {
 	req := UsersSearchRequest{Query: query}
@@ -43,8 +46,9 @@ func UsersSearchActivity(ctx workflow.Context, query string) ([]User, error) {
 	return *resp, nil
 }
 
-// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
-// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
+// User is based on:
+//   - https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
+//   - https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-user-search/#api-rest-api-3-user-search-get
 type User struct {
 	Self        string `json:"self"`
 	AccountID   string `json:"accountId"`

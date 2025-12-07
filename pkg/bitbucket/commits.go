@@ -6,10 +6,11 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	CommitsDiffActivityName     = "bitbucket.commits.diff"
 	CommitsDiffstatActivityName = "bitbucket.commits.diffstat"
-)
+) //revive:enable:exported
 
 // CommitsDiffRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get

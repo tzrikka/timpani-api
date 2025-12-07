@@ -6,9 +6,10 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	AuthTestActivityName = "slack.auth.test"
-)
+) //revive:enable:exported
 
 // AuthTestResponse is based on:
 // https://docs.slack.dev/reference/methods/auth.test/

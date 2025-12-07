@@ -34,7 +34,7 @@ linters:
     - perfsprint
     - predeclared
     - recvcheck
-    # - revive
+    - revive
     - staticcheck
     - unconvert
     - unused

@@ -6,12 +6,13 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	BookmarksAddActivityName    = "slack.bookmarks.add"
 	BookmarksEditActivityName   = "slack.bookmarks.edit"
 	BookmarksListActivityName   = "slack.bookmarks.list"
 	BookmarksRemoveActivityName = "slack.bookmarks.remove"
-)
+) //revive:enable:exported
 
 // BookmarksAddRequest is based on:
 // https://docs.slack.dev/reference/methods/bookmarks.add/
@@ -113,6 +114,10 @@ func BookmarksRemove(ctx workflow.Context, channelID, bookmarkID string) error {
 	return internal.ExecuteTimpaniActivityNoResp(ctx, BookmarksRemoveActivityName, req)
 }
 
+// Bookmark is based on:
+//   - https://docs.slack.dev/reference/methods/bookmarks.add/
+//   - https://docs.slack.dev/reference/methods/bookmarks.edit/
+//   - https://docs.slack.dev/reference/methods/bookmarks.list/
 type Bookmark struct {
 	ID        string `json:"id"`
 	ChannelID string `json:"channel_id"`

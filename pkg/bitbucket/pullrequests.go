@@ -6,6 +6,7 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	PullRequestsApproveActivityName         = "bitbucket.pullrequests.approve"
 	PullRequestsCreateCommentActivityName   = "bitbucket.pullrequests.createComment"
@@ -18,7 +19,7 @@ const (
 	PullRequestsMergeActivityName           = "bitbucket.pullrequests.merge"
 	PullRequestsUnapproveActivityName       = "bitbucket.pullrequests.unapprove"
 	PullRequestsUpdateCommentActivityName   = "bitbucket.pullrequests.updateComment"
-)
+) //revive:enable:exported
 
 // PullRequestsApproveRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
@@ -355,34 +356,41 @@ func PullRequestsUpdateComment(ctx workflow.Context, req PullRequestsUpdateComme
 	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUpdateCommentActivityName, req)
 }
 
+// Commit is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-get
 type Commit struct {
 	// Type string `json:"type"` // Always "commit".
 
-	Hash    string    `json:"hash"`
-	Date    string    `json:"date,omitempty"`
-	Author  *User     `json:"author,omitempty"`
-	Message string    `json:"message,omitempty"`
-	Summary *Rendered `json:"summary,omitempty"`
-	Parents []Commit  `json:"parents,omitempty"`
+	Hash    string   `json:"hash"`
+	Date    string   `json:"date,omitempty"`
+	Author  *User    `json:"author,omitempty"`
+	Message string   `json:"message,omitempty"`
+	Parents []Commit `json:"parents,omitempty"`
 
 	// Repository *Repository `json:"repository,omitempty"` // Unnecessary.
+	// Summary *Rendered `json:"summary,omitempty"`         // Unnecessary.
 
 	Links map[string]Link `json:"links"`
 }
 
+//revive:disable:exported
 type Link struct {
 	HRef string `json:"href"`
-}
+} //revive:enable:exported
 
+// Parent is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
 type Parent struct {
 	ID    int             `json:"id"`
 	Links map[string]Link `json:"links"`
 }
 
-type Rendered struct {
-	// Type string `json:"type"` // Always "rendered".
-
-	Raw    string `json:"raw"`
-	Markup string `json:"markup"`
-	HTML   string `json:"html"`
-}
+// Rendered is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-get
+// type Rendered struct {
+// 	// Type string `json:"type"` // Always "rendered".
+//
+// 	Raw    string `json:"raw"`
+// 	Markup string `json:"markup"`
+// 	HTML   string `json:"html"`
+// }.

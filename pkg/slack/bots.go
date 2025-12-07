@@ -6,9 +6,10 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	BotsInfoActivityName = "slack.bots.info"
-)
+) //revive:enable:exported
 
 // BotsInfoRequest is based on:
 // https://docs.slack.dev/reference/methods/bots.info/

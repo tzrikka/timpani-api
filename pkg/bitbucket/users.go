@@ -6,9 +6,10 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	UsersGetActivityName = "bitbucket.users.get"
-)
+) //revive:enable:exported
 
 // UsersGetRequest is based on:
 //   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get

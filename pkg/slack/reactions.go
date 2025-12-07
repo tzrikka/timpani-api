@@ -6,12 +6,13 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	ReactionsAddActivityName    = "slack.reactions.add"
 	ReactionsGetActivityName    = "slack.reactions.get"
 	ReactionsListActivityName   = "slack.reactions.list"
 	ReactionsRemoveActivityName = "slack.reactions.remove"
-)
+) //revive:enable:exported
 
 // ReactionsAddRequest is based on:
 // https://docs.slack.dev/reference/methods/reactions.add/

@@ -1,5 +1,7 @@
 package slack
 
+//revive:disable:exported
+
 type Response struct {
 	OK               bool              `json:"ok"`
 	Error            string            `json:"error,omitempty"`
@@ -14,3 +16,5 @@ type ResponseMetadata struct {
 	Warnings   []string `json:"warnings,omitempty"`
 	NextCursor string   `json:"next_cursor,omitempty"`
 }
+
+//revive:enable:exported

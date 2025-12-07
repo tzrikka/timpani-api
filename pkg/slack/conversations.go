@@ -8,6 +8,7 @@ import (
 	"github.com/tzrikka/timpani-api/internal"
 )
 
+//revive:disable:exported
 const (
 	ConversationsArchiveActivityName    = "slack.conversations.archive"
 	ConversationsCloseActivityName      = "slack.conversations.close"
@@ -25,7 +26,7 @@ const (
 	ConversationsRepliesActivityName    = "slack.conversations.replies"
 	ConversationsSetPurposeActivityName = "slack.conversations.setPurpose"
 	ConversationsSetTopicActivityName   = "slack.conversations.setTopic"
-)
+) //revive:enable:exported
 
 // ConversationsArchiveRequest is based on:
 // https://docs.slack.dev/reference/methods/conversations.archive/

@@ -28,4 +28,5 @@ func DefaultActivityOptions(taskQueue string) *workflow.ActivityOptions {
 	}
 }
 
+// RetryPolicy is an alias for [temporal.RetryPolicy].
 type RetryPolicy = temporal.RetryPolicy
