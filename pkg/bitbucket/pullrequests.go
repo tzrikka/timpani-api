@@ -324,7 +324,11 @@ func PullRequestsUnapprove(ctx workflow.Context, req PullRequestsUnapproveReques
 
 // PullRequestsUpdateRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-put
-type PullRequestsUpdateRequest = prRequest
+type PullRequestsUpdateRequest struct {
+	prRequest
+
+	PullRequest map[string]any `json:"pullrequest"`
+}
 
 // PullRequestsUpdate is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-put
