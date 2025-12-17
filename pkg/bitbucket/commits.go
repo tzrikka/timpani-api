@@ -12,9 +12,7 @@ const (
 	CommitsDiffstatActivityName = "bitbucket.commits.diffstat"
 ) //revive:enable:exported
 
-// CommitsDiffRequest is based on:
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
-type CommitsDiffRequest struct {
+type commitsRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
 	Workspace string `json:"workspace"`
@@ -23,6 +21,10 @@ type CommitsDiffRequest struct {
 
 	Path string `json:"path,omitempty"`
 }
+
+// CommitsDiffRequest is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
+type CommitsDiffRequest = commitsRequest
 
 // CommitsDiff is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
@@ -37,17 +39,12 @@ func CommitsDiff(ctx workflow.Context, req CommitsDiffRequest) (string, error) {
 // CommitsDiffstatRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
 type CommitsDiffstatRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+	commitsRequest
 
-	Workspace string `json:"workspace"`
-	RepoSlug  string `json:"repo_slug"`
-	Spec      string `json:"spec"`
-
-	IgnoreWhitespace bool   `json:"ignore_whitespace,omitempty"`
-	Merge            bool   `json:"merge,omitempty"`
-	Renames          bool   `json:"renames,omitempty"`
-	Topic            bool   `json:"topic,omitempty"`
-	Path             string `json:"path,omitempty"`
+	IgnoreWhitespace bool `json:"ignore_whitespace,omitempty"`
+	Merge            bool `json:"merge,omitempty"`
+	Renames          bool `json:"renames,omitempty"`
+	Topic            bool `json:"topic,omitempty"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
 	PageLen string `json:"pagelen,omitempty"`

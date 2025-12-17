@@ -13,23 +13,27 @@ const (
 	PullRequestsDeclineActivityName         = "bitbucket.pullrequests.decline"
 	PullRequestsDeleteCommentActivityName   = "bitbucket.pullrequests.deleteComment"
 	PullRequestsDiffstatActivityName        = "bitbucket.pullrequests.diffstat"
+	PullRequestsGetActivityName             = "bitbucket.pullrequests.get"
 	PullRequestsListActivityLogActivityName = "bitbucket.pullrequests.listActivityLog"
 	PullRequestsListCommitsActivityName     = "bitbucket.pullrequests.listCommits"
 	PullRequestsListForCommitActivityName   = "bitbucket.pullrequests.listForCommit"
 	PullRequestsMergeActivityName           = "bitbucket.pullrequests.merge"
 	PullRequestsUnapproveActivityName       = "bitbucket.pullrequests.unapprove"
+	PullRequestsUpdateActivityName          = "bitbucket.pullrequests.update"
 	PullRequestsUpdateCommentActivityName   = "bitbucket.pullrequests.updateComment"
 ) //revive:enable:exported
 
-// PullRequestsApproveRequest is based on:
-// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
-type PullRequestsApproveRequest struct {
+type prRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
 	Workspace     string `json:"workspace"`
 	RepoSlug      string `json:"repo_slug"`
 	PullRequestID string `json:"pull_request_id"`
 }
+
+// PullRequestsApproveRequest is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
+type PullRequestsApproveRequest = prRequest
 
 // PullRequestsApprove is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
@@ -40,12 +44,9 @@ func PullRequestsApprove(ctx workflow.Context, req PullRequestsApproveRequest) e
 // PullRequestsCreateCommentRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
 type PullRequestsCreateCommentRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+	prRequest
 
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
-	Markdown      string `json:"text"`
+	Markdown string `json:"text"`
 
 	ParentID string `json:"parent_id,omitempty"`
 }
@@ -78,13 +79,7 @@ func PullRequestsCreateComment(ctx workflow.Context, req PullRequestsCreateComme
 
 // PullRequestsDeclineRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-decline-post
-type PullRequestsDeclineRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
-
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
-}
+type PullRequestsDeclineRequest = prRequest
 
 // PullRequestsDecline is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-decline-post
@@ -95,12 +90,9 @@ func PullRequestsDecline(ctx workflow.Context, req PullRequestsDeclineRequest) e
 // PullRequestsDeleteCommentRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
 type PullRequestsDeleteCommentRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+	prRequest
 
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
-	CommentID     string `json:"comment_id"`
+	CommentID string `json:"comment_id"`
 }
 
 // PullRequestsDeleteComment is based on:
@@ -112,11 +104,7 @@ func PullRequestsDeleteComment(ctx workflow.Context, req PullRequestsDeleteComme
 // PullRequestsDiffstatRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-diffstat-get
 type PullRequestsDiffstatRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
-
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
+	prRequest
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
 	PageLen string `json:"pagelen,omitempty"`
@@ -152,14 +140,24 @@ func PullRequestsDiffstat(ctx workflow.Context, req PullRequestsDiffstatRequest)
 	return ds, nil
 }
 
+// PullRequestsGetRequest is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-get
+type PullRequestsGetRequest = prRequest
+
+// PullRequestsGet is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-get
+func PullRequestsGet(ctx workflow.Context, req PullRequestsGetRequest) (map[string]any, error) {
+	resp, err := internal.ExecuteTimpaniActivity[map[string]any](ctx, PullRequestsGetActivityName, req)
+	if err != nil {
+		return nil, err
+	}
+	return *resp, nil
+}
+
 // PullRequestsListActivityLogRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
 type PullRequestsListActivityLogRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
-
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
+	prRequest
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
 	PageLen string `json:"pagelen,omitempty"`
@@ -204,11 +202,7 @@ func PullRequestsListActivityLog(ctx workflow.Context, req PullRequestsListActiv
 // PullRequestsListCommitsRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-commits-get
 type PullRequestsListCommitsRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
-
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
+	prRequest
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
 	PageLen string `json:"pagelen,omitempty"`
@@ -304,11 +298,7 @@ func PullRequestsListForCommit(ctx workflow.Context, req PullRequestsListForComm
 // PullRequestsMergeRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-merge-post
 type PullRequestsMergeRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
-
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
+	prRequest
 
 	Type              string `json:"type,omitempty"`
 	Message           string `json:"message,omitempty"`
@@ -324,13 +314,7 @@ func PullRequestsMerge(ctx workflow.Context, req PullRequestsMergeRequest) error
 
 // PullRequestsUnapproveRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-delete
-type PullRequestsUnapproveRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
-
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
-}
+type PullRequestsUnapproveRequest = prRequest
 
 // PullRequestsUnapprove is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-delete
@@ -338,16 +322,27 @@ func PullRequestsUnapprove(ctx workflow.Context, req PullRequestsUnapproveReques
 	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUnapproveActivityName, req)
 }
 
+// PullRequestsUpdateRequest is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-put
+type PullRequestsUpdateRequest = prRequest
+
+// PullRequestsUpdate is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-put
+func PullRequestsUpdate(ctx workflow.Context, req PullRequestsUpdateRequest) (map[string]any, error) {
+	resp, err := internal.ExecuteTimpaniActivity[map[string]any](ctx, PullRequestsUpdateActivityName, req)
+	if err != nil {
+		return nil, err
+	}
+	return *resp, nil
+}
+
 // PullRequestsUpdateCommentRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-put
 type PullRequestsUpdateCommentRequest struct {
-	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+	prRequest
 
-	Workspace     string `json:"workspace"`
-	RepoSlug      string `json:"repo_slug"`
-	PullRequestID string `json:"pull_request_id"`
-	CommentID     string `json:"comment_id"`
-	Markdown      string `json:"text"`
+	CommentID string `json:"comment_id"`
+	Markdown  string `json:"text"`
 }
 
 // PullRequestsUpdateComment is based on:

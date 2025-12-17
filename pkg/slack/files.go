@@ -112,8 +112,8 @@ type File struct {
 	ID    string `json:"id,omitempty"`
 	Title string `json:"title,omitempty"`
 
-	Created      int    `json:"created,omitempty"`
-	Updated      int    `json:"updated,omitempty"`
+	Created      int64  `json:"created,omitempty"`
+	Updated      int64  `json:"updated,omitempty"`
 	Size         int    `json:"size,omitempty"`
 	Name         string `json:"name,omitempty"`
 	FileType     string `json:"filetype,omitempty"`
