@@ -12,7 +12,8 @@ const (
 	CommitsDiffstatActivityName = "bitbucket.commits.diffstat"
 ) //revive:enable:exported
 
-type commitsRequest struct {
+// CommitsRequest contains common fields for commit-related requests.
+type CommitsRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
 	Workspace string `json:"workspace"`
@@ -24,7 +25,7 @@ type commitsRequest struct {
 
 // CommitsDiffRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
-type CommitsDiffRequest = commitsRequest
+type CommitsDiffRequest = CommitsRequest
 
 // CommitsDiff is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get
@@ -39,7 +40,7 @@ func CommitsDiff(ctx workflow.Context, req CommitsDiffRequest) (string, error) {
 // CommitsDiffstatRequest is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
 type CommitsDiffstatRequest struct {
-	commitsRequest
+	CommitsRequest
 
 	IgnoreWhitespace bool `json:"ignore_whitespace,omitempty"`
 	Merge            bool `json:"merge,omitempty"`
