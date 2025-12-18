@@ -72,28 +72,38 @@ func UserGroupsUsersList(ctx workflow.Context, usergroup string, includeDisabled
 // UserGroup is based on:
 // https://docs.slack.dev/reference/objects/usergroup-object/
 type UserGroup struct {
-	ID     string `json:"id,omitempty"`
-	TeamID string `json:"team_id,omitempty"`
-
-	// IsUsergroup bool `json:"is_usergroup,omitempty"` // Always true.
+	ID                  string `json:"id,omitempty"`
+	TeamID              string `json:"team_id,omitempty"`
+	EnterpriseSubteamID string `json:"enterprise_subteam_id,omitempty"`
 
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 	Handle      string `json:"handle,omitempty"`
 	AutoType    string `json:"auto_type,omitempty"`
-	IsExternal  bool   `json:"is_external,omitempty"`
 
 	DateCreate int64 `json:"date_create,omitempty"`
 	DateUpdate int64 `json:"date_update,omitempty"`
 	DateDelete int64 `json:"date_delete,omitempty"`
 
-	CreatedBy string `json:"created_by,omitempty"`
-	UpdatedBy string `json:"updated_by,omitempty"`
-	DeletedBy string `json:"deleted_by,omitempty"`
+	// CreatedBy string `json:"created_by,omitempty"`
+	// UpdatedBy string `json:"updated_by,omitempty"`
+	// DeletedBy string `json:"deleted_by,omitempty"`.
 
-	Prefs     Prefs    `json:"prefs"`
-	Users     []string `json:"users,omitempty"`
-	UserCount int      `json:"user_count,omitempty"`
+	// IsUsergroup         bool `json:"is_usergroup,omitempty"`
+	// IsSubteam           bool `json:"is_subteam,omitempty"`
+	// IsExternal          bool `json:"is_external,omitempty"`
+	// IsIDPGroup          bool `json:"is_idp_group,omitempty"`
+	// IsOrgLevel          bool `json:"is_org_level,omitempty"`
+	// IsEditingRestricted bool `json:"is_editing_restricted,omitempty"`
+	// IsMembershipLocked  bool `json:"is_membership_locked,omitempty"`
+	// IsSection           bool `json:"is_section,omitempty"`
+	// IsVisible           bool `json:"is_visible,omitempty"`.
+
+	Prefs Prefs    `json:"prefs"`
+	Users []string `json:"users,omitempty"`
+
+	UserCount    int `json:"user_count,omitempty"`
+	ChannelCount int `json:"channel_count,omitempty"`
 }
 
 // Prefs is based on:
