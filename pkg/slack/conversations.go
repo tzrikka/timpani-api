@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"errors"
 	"strings"
 
 	"go.temporal.io/sdk/workflow"
@@ -87,8 +88,11 @@ func ConversationsCreate(ctx workflow.Context, name string, private bool) (strin
 		return "", err
 	}
 
-	// The key is guaranteed to exist, and the value is guaranteed to be a string.
-	return resp.Channel["id"].(string), nil
+	id, ok := resp.Channel["id"].(string)
+	if !ok {
+		return "", errors.New("channel ID is missing or invalid")
+	}
+	return id, nil
 }
 
 // ConversationsHistoryRequest is based on:

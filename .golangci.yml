@@ -2,6 +2,7 @@ version: "2"
 
 linters:
   enable:
+    - asasalint
     - asciicheck
     - bidichk
     - canonicalheader
@@ -19,31 +20,44 @@ linters:
     - fatcontext
     - gocheckcompilerdirectives
     - gocritic
+    - godoclint
     - godot
     - godox
     - gosec
     - gosmopolitan
     - govet
+    - iface
     - ineffassign
     - intrange
     - mirror
     - misspell
+    - modernize
     - musttag
     - noctx
     - nosprintfhostport
     - perfsprint
     - predeclared
+    - protogetter
     - recvcheck
     - revive
     - staticcheck
+    - thelper
     - unconvert
     - unused
     - usestdlibvars
+    - usetesting
 
   settings:
+    errcheck:
+      check-type-assertions: true
     godot:
       scope: all
       capital: true
+    iface:
+      enable:
+        - identical
+        - unused
+        - unexported
     misspell:
       locale: US
     predeclared:
