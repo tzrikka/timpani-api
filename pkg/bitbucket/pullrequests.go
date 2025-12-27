@@ -14,6 +14,7 @@ const (
 	PullRequestsDeleteCommentActivityName   = "bitbucket.pullrequests.deleteComment"
 	PullRequestsDiffstatActivityName        = "bitbucket.pullrequests.diffstat"
 	PullRequestsGetActivityName             = "bitbucket.pullrequests.get"
+	PullRequestsGetCommentActivityName      = "bitbucket.pullrequests.getComment"
 	PullRequestsListActivityLogActivityName = "bitbucket.pullrequests.listActivityLog"
 	PullRequestsListCommitsActivityName     = "bitbucket.pullrequests.listCommits"
 	PullRequestsListForCommitActivityName   = "bitbucket.pullrequests.listForCommit"
@@ -54,23 +55,7 @@ type PullRequestsCreateCommentRequest struct {
 
 // PullRequestsCreateCommentResponse is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
-type PullRequestsCreateCommentResponse struct {
-	// Type string `json:"type"` // Always "pullrequest_comment".
-
-	ID int `json:"id"`
-
-	// Content          `json:"content"`     // Unnecessary.
-	// PullRequest      `json:"pullrequest"` // Unnecessary.
-	// CreatedOn string `json:"created_on"`  // Unnecessary.
-	// UpdatedOn string `json:"updated_on"`  // Unnecessary.
-	// Deleted   bool   `json:"deleted"`     // Always false.
-	// Pending   bool   `json:"pending"`     // Unnecessary.
-
-	User   User    `json:"user"`
-	Parent *Parent `json:"parent,omitempty"`
-
-	Links map[string]Link `json:"links"`
-}
+type PullRequestsCreateCommentResponse = Comment
 
 // PullRequestsCreateComment is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-post
@@ -153,6 +138,28 @@ func PullRequestsGet(ctx workflow.Context, req PullRequestsGetRequest) (map[stri
 		return nil, err
 	}
 	return *resp, nil
+}
+
+// PullRequestsGetCommentRequest is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-get
+type PullRequestsGetCommentRequest struct {
+	PullRequestsRequest
+
+	CommentID string `json:"comment_id"`
+}
+
+// PullRequestsGetCommentResponse is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-get
+type PullRequestsGetCommentResponse = Comment
+
+// PullRequestsGetComment is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-get
+func PullRequestsGetComment(ctx workflow.Context, req PullRequestsGetCommentRequest) (*Comment, error) {
+	resp, err := internal.ExecuteTimpaniActivity[Comment](ctx, PullRequestsGetCommentActivityName, req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 // PullRequestsListActivityLogRequest is based on:
@@ -356,6 +363,28 @@ func PullRequestsUpdateComment(ctx workflow.Context, req PullRequestsUpdateComme
 	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUpdateCommentActivityName, req)
 }
 
+// Comment is based on:
+// https://support.atlassian.com/bitbucket-cloud/docs/event-payloads/#Comment
+type Comment struct {
+	// Type string `json:"type"` // Always "pullrequest_comment".
+
+	ID     int     `json:"id"`
+	Parent *Parent `json:"parent,omitempty"`
+
+	CreatedOn string `json:"created_on"`
+	UpdatedOn string `json:"updated_on"`
+	Deleted   bool   `json:"deleted"`
+	Pending   bool   `json:"pending"`
+
+	Content Rendered `json:"content"`
+	Inline  *Inline  `json:"inline"`
+	User    User     `json:"user"`
+
+	// PullRequest `json:"pullrequest"` // Unnecessary.
+
+	Links map[string]Link `json:"links"`
+}
+
 // Commit is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-get
 type Commit struct {
@@ -373,6 +402,25 @@ type Commit struct {
 	Links map[string]Link `json:"links"`
 }
 
+// Inline is based on:
+// https://support.atlassian.com/bitbucket-cloud/docs/event-payloads/#Comment
+type Inline struct {
+	Path string `json:"path"`
+
+	StartFrom *int `json:"start_from"`
+	StartTo   *int `json:"start_to"`
+	From      *int `json:"from"`
+	To        *int `json:"to"`
+
+	ContextLines string `json:"context_lines"`
+	Outdated     bool   `json:"outdated"`
+
+	SrcRev  string `json:"src_rev"`
+	DestRev string `json:"dest_rev"`
+
+	// What is "base_rev"? It is useful?
+}
+
 //revive:disable:exported
 type Link struct {
 	HRef string `json:"href"`
@@ -384,3 +432,12 @@ type Parent struct {
 	ID    int             `json:"id"`
 	Links map[string]Link `json:"links"`
 }
+
+//revive:disable:exported
+type Rendered struct {
+	// Type string `json:"type"` // Always "rendered".
+
+	Raw    string `json:"raw"`
+	Markup string `json:"markup"`
+	HTML   string `json:"html"`
+} //revive:enable:exported
