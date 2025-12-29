@@ -1,6 +1,8 @@
 package bitbucket
 
 import (
+	"strconv"
+
 	"go.temporal.io/sdk/workflow"
 
 	"github.com/tzrikka/timpani-api/internal"
@@ -39,8 +41,13 @@ type PullRequestsApproveRequest = PullRequestsRequest
 
 // PullRequestsApprove is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-post
-func PullRequestsApprove(ctx workflow.Context, req PullRequestsApproveRequest) error {
-	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsApproveActivityName, req)
+func PullRequestsApprove(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsApproveActivityName, PullRequestsApproveRequest{
+		ThrippyLinkID: thrippyLinkID,
+		Workspace:     workspace,
+		RepoSlug:      repo,
+		PullRequestID: prID,
+	})
 }
 
 // PullRequestsCreateCommentRequest is based on:
@@ -69,8 +76,13 @@ type PullRequestsDeclineRequest = PullRequestsRequest
 
 // PullRequestsDecline is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-decline-post
-func PullRequestsDecline(ctx workflow.Context, req PullRequestsDeclineRequest) error {
-	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsDeclineActivityName, req)
+func PullRequestsDecline(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsDeclineActivityName, PullRequestsDeclineRequest{
+		ThrippyLinkID: thrippyLinkID,
+		Workspace:     workspace,
+		RepoSlug:      repo,
+		PullRequestID: prID,
+	})
 }
 
 // PullRequestsDeleteCommentRequest is based on:
@@ -83,8 +95,16 @@ type PullRequestsDeleteCommentRequest struct {
 
 // PullRequestsDeleteComment is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-delete
-func PullRequestsDeleteComment(ctx workflow.Context, req PullRequestsDeleteCommentRequest) error {
-	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsDeleteCommentActivityName, req)
+func PullRequestsDeleteComment(ctx workflow.Context, thrippyLinkID, workspace, repo, prID, commentID string) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsDeleteCommentActivityName, PullRequestsDeleteCommentRequest{
+		PullRequestsRequest: PullRequestsRequest{
+			ThrippyLinkID: thrippyLinkID,
+			Workspace:     workspace,
+			RepoSlug:      repo,
+			PullRequestID: prID,
+		},
+		CommentID: commentID,
+	})
 }
 
 // PullRequestsDiffstatRequest is based on:
@@ -105,10 +125,20 @@ type PullRequestsDiffstatResponse = CommitsDiffstatResponse
 
 // PullRequestsDiffstat is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-diffstat-get
-func PullRequestsDiffstat(ctx workflow.Context, req PullRequestsDiffstatRequest) ([]Diffstat, error) {
-	var ds []Diffstat
-	req.Next = "start"
+//
+// It retrieves the full list of diffstat entries by handling pagination internally.
+func PullRequestsDiffstat(ctx workflow.Context, thrippyLinkID, workspace, repo string, prID int) ([]Diffstat, error) {
+	req := PullRequestsDiffstatRequest{
+		PullRequestsRequest: PullRequestsRequest{
+			ThrippyLinkID: thrippyLinkID,
+			Workspace:     workspace,
+			RepoSlug:      repo,
+			PullRequestID: strconv.Itoa(prID),
+		},
+		Next: "start",
+	}
 
+	var ds []Diffstat
 	for req.Next != "" {
 		if req.Next == "start" {
 			req.Next = ""
@@ -132,8 +162,13 @@ type PullRequestsGetRequest = PullRequestsRequest
 
 // PullRequestsGet is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-get
-func PullRequestsGet(ctx workflow.Context, req PullRequestsGetRequest) (map[string]any, error) {
-	resp, err := internal.ExecuteTimpaniActivity[map[string]any](ctx, PullRequestsGetActivityName, req)
+func PullRequestsGet(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string) (map[string]any, error) {
+	resp, err := internal.ExecuteTimpaniActivity[map[string]any](ctx, PullRequestsGetActivityName, PullRequestsGetRequest{
+		ThrippyLinkID: thrippyLinkID,
+		Workspace:     workspace,
+		RepoSlug:      repo,
+		PullRequestID: prID,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +189,16 @@ type PullRequestsGetCommentResponse = Comment
 
 // PullRequestsGetComment is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-get
-func PullRequestsGetComment(ctx workflow.Context, req PullRequestsGetCommentRequest) (*Comment, error) {
-	resp, err := internal.ExecuteTimpaniActivity[Comment](ctx, PullRequestsGetCommentActivityName, req)
+func PullRequestsGetComment(ctx workflow.Context, thrippyLinkID, workspace, repo, prID, commentID string) (*Comment, error) {
+	resp, err := internal.ExecuteTimpaniActivity[Comment](ctx, PullRequestsGetCommentActivityName, PullRequestsGetCommentRequest{
+		PullRequestsRequest: PullRequestsRequest{
+			ThrippyLinkID: thrippyLinkID,
+			Workspace:     workspace,
+			RepoSlug:      repo,
+			PullRequestID: prID,
+		},
+		CommentID: commentID,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -188,8 +231,6 @@ type PullRequestsListActivityLogResponse struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
 func PullRequestsListActivityLog(ctx workflow.Context, req PullRequestsListActivityLogRequest) ([]map[string]any, error) {
 	var activities []map[string]any
-	req.Next = "start"
-
 	for req.Next != "" {
 		if req.Next == "start" {
 			req.Next = ""
@@ -232,10 +273,20 @@ type PullRequestsListCommitsResponse struct {
 
 // PullRequestsListCommits is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-commits-get
-func PullRequestsListCommits(ctx workflow.Context, req PullRequestsListCommitsRequest) ([]Commit, error) {
-	var cs []Commit
-	req.Next = "start"
+//
+// It retrieves the full list of commits by handling pagination internally.
+func PullRequestsListCommits(ctx workflow.Context, thrippyLinkID, workspace, repo string, prID int) ([]Commit, error) {
+	req := PullRequestsListCommitsRequest{
+		PullRequestsRequest: PullRequestsRequest{
+			ThrippyLinkID: thrippyLinkID,
+			Workspace:     workspace,
+			RepoSlug:      repo,
+			PullRequestID: strconv.Itoa(prID),
+		},
+		Next: "start",
+	}
 
+	var cs []Commit
 	for req.Next != "" {
 		if req.Next == "start" {
 			req.Next = ""
@@ -284,8 +335,6 @@ type PullRequestsListForCommitResponse struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-commit-commit-pullrequests-get
 func PullRequestsListForCommit(ctx workflow.Context, req PullRequestsListForCommitRequest) ([]map[string]any, error) {
 	var prs []map[string]any
-	req.Next = "start"
-
 	for req.Next != "" {
 		if req.Next == "start" {
 			req.Next = ""
@@ -326,8 +375,13 @@ type PullRequestsUnapproveRequest = PullRequestsRequest
 
 // PullRequestsUnapprove is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-approve-delete
-func PullRequestsUnapprove(ctx workflow.Context, req PullRequestsUnapproveRequest) error {
-	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUnapproveActivityName, req)
+func PullRequestsUnapprove(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUnapproveActivityName, PullRequestsUnapproveRequest{
+		ThrippyLinkID: thrippyLinkID,
+		Workspace:     workspace,
+		RepoSlug:      repo,
+		PullRequestID: prID,
+	})
 }
 
 // PullRequestsUpdateRequest is based on:
@@ -340,8 +394,16 @@ type PullRequestsUpdateRequest struct {
 
 // PullRequestsUpdate is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-put
-func PullRequestsUpdate(ctx workflow.Context, req PullRequestsUpdateRequest) (map[string]any, error) {
-	resp, err := internal.ExecuteTimpaniActivity[map[string]any](ctx, PullRequestsUpdateActivityName, req)
+func PullRequestsUpdate(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string, update map[string]any) (map[string]any, error) {
+	resp, err := internal.ExecuteTimpaniActivity[map[string]any](ctx, PullRequestsUpdateActivityName, PullRequestsUpdateRequest{
+		PullRequestsRequest: PullRequestsRequest{
+			ThrippyLinkID: thrippyLinkID,
+			Workspace:     workspace,
+			RepoSlug:      repo,
+			PullRequestID: prID,
+		},
+		PullRequest: update,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -359,8 +421,17 @@ type PullRequestsUpdateCommentRequest struct {
 
 // PullRequestsUpdateComment is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-comments-comment-id-put
-func PullRequestsUpdateComment(ctx workflow.Context, req PullRequestsUpdateCommentRequest) error {
-	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUpdateCommentActivityName, req)
+func PullRequestsUpdateComment(ctx workflow.Context, thrippyLinkID, workspace, repo, prID, commentID, markdown string) error {
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsUpdateCommentActivityName, PullRequestsUpdateCommentRequest{
+		PullRequestsRequest: PullRequestsRequest{
+			ThrippyLinkID: thrippyLinkID,
+			Workspace:     workspace,
+			RepoSlug:      repo,
+			PullRequestID: prID,
+		},
+		CommentID: commentID,
+		Markdown:  markdown,
+	})
 }
 
 // Comment is based on:

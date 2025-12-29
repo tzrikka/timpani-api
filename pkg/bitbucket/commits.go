@@ -70,8 +70,6 @@ type CommitsDiffstatResponse struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
 func CommitsDiffstat(ctx workflow.Context, req CommitsDiffstatRequest) ([]Diffstat, error) {
 	var ds []Diffstat
-	req.Next = "start"
-
 	for req.Next != "" {
 		if req.Next == "start" {
 			req.Next = ""
