@@ -167,8 +167,7 @@ type ConversationsInviteResponse struct {
 	Response
 
 	// https://docs.slack.dev/reference/objects/conversation-object/
-	Channel map[string]any   `json:"channel,omitempty"`
-	Errors  []map[string]any `json:"errors,omitempty"`
+	Channel map[string]any `json:"channel,omitempty"`
 }
 
 // ConversationsInvite is based on:
