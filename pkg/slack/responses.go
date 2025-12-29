@@ -5,6 +5,7 @@ package slack
 type Response struct {
 	OK               bool              `json:"ok"`
 	Error            string            `json:"error,omitempty"`
+	Errors           []any             `json:"errors,omitempty"`   // More details (undocumented).
 	Needed           string            `json:"needed,omitempty"`   // Scope errors (undocumented).
 	Provided         string            `json:"provided,omitempty"` // Scope errors (undocumented).
 	Warning          string            `json:"warning,omitempty"`
