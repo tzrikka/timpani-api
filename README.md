@@ -1,6 +1,7 @@
 # Timpani API
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/tzrikka/timpani-api.svg)](https://pkg.go.dev/github.com/tzrikka/timpani-api)
+[![Code Wiki](https://img.shields.io/badge/Code_Wiki-gold?logo=googlegemini)](https://codewiki.google/github.com/tzrikka/timpani-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tzrikka/timpani-api)](https://goreportcard.com/report/github.com/tzrikka/timpani-api)
 
 Thin, easy-to-use API wrappers for [Temporal](https://temporal.io/) workflows that use [Timpani](https://github.com/tzrikka/timpani).
