@@ -24,12 +24,24 @@ type UsersGetRequest struct {
 //   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
 type UsersGetResponse = User
 
-// UsersGet is based on:
-//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
-//   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
-func UsersGet(ctx workflow.Context, accountID, uuid string) (*User, error) {
-	req := UsersGetRequest{AccountID: accountID, UUID: uuid}
+// UsersGetByAccountID is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+func UsersGetByAccountID(ctx workflow.Context, accountID string) (*User, error) {
+	req := UsersGetRequest{AccountID: accountID}
 	return internal.ExecuteTimpaniActivity[UsersGetResponse](ctx, UsersGetActivityName, req)
+}
+
+// UsersGetByUUID is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
+func UsersGetByUUID(ctx workflow.Context, uuid string) (*User, error) {
+	req := UsersGetRequest{UUID: uuid}
+	return internal.ExecuteTimpaniActivity[UsersGetResponse](ctx, UsersGetActivityName, req)
+}
+
+// UsersGetCurrent is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
+func UsersGetCurrent(ctx workflow.Context) (*User, error) {
+	return internal.ExecuteTimpaniActivity[UsersGetResponse](ctx, UsersGetActivityName, UsersGetRequest{})
 }
 
 // User is based on:
