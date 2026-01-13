@@ -109,7 +109,7 @@ type PullRequestsCommentsCreateReplyRequest struct {
 	PullRequestsRequest
 
 	CommentID int    `json:"comment_id"`
-	Body      string `json:"body,omitempty"`
+	Body      string `json:"body"`
 }
 
 // PullRequestsCommentsDeleteRequest is based on:
@@ -156,7 +156,14 @@ type PullRequestsReviewsDismissRequest struct {
 
 // PullRequestsReviewsSubmitRequest is based on:
 // https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#submit-a-review-for-a-pull-request
-type PullRequestsReviewsSubmitRequest = PullRequestsReviewsDismissRequest
+type PullRequestsReviewsSubmitRequest struct {
+	PullRequestsRequest
+
+	ReviewID int    `json:"review_id"`
+	Body     string `json:"body,omitempty"`
+
+	Event string `json:"event,omitempty"` // "APPROVE", "REQUEST_CHANGES", "COMMENT".
+}
 
 // PullRequestsReviewsUpdateRequest is based on:
 // https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#update-a-review-for-a-pull-request
@@ -164,7 +171,5 @@ type PullRequestsReviewsUpdateRequest struct {
 	PullRequestsRequest
 
 	ReviewID int    `json:"review_id"`
-	Event    string `json:"event"` // "APPROVE", "REQUEST_CHANGES", "COMMENT".
-
-	Body string `json:"body,omitempty"`
+	Body     string `json:"body"`
 }
