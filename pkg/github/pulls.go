@@ -1,5 +1,13 @@
 package github
 
+import (
+	"time"
+
+	"go.temporal.io/sdk/workflow"
+
+	"github.com/tzrikka/timpani-api/internal"
+)
+
 //revive:disable:exported
 const (
 	PullRequestsGetActivityName         = "github.pulls.get"
@@ -38,9 +46,26 @@ type PullRequestsCommentsRequest struct {
 	CommentID int    `json:"comment_id"`
 }
 
+// PullRequestsReviewsRequest contains common fields for PR review-related requests.
+type PullRequestsReviewsRequest struct {
+	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
+
+	Owner      string `json:"owner"`
+	Repo       string `json:"repo"`
+	PullNumber int    `json:"pull_number"`
+	ReviewID   int    `json:"review_id"`
+}
+
 // PullRequestsGetRequest is based on:
 // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request
 type PullRequestsGetRequest = PullRequestsRequest
+
+// PullRequestsGet is based on:
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request
+func PullRequestsGet(ctx workflow.Context, thrippyLinkID, owner, repo string, prID int) (*PullRequest, error) {
+	req := PullRequestsGetRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, PullNumber: prID}
+	return internal.ExecuteTimpaniActivity[PullRequest](ctx, PullRequestsGetActivityName, req)
+}
 
 // PullRequestsListCommitsRequest is based on:
 // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-commits-on-a-pull-request
@@ -73,6 +98,20 @@ type PullRequestsMergeRequest struct {
 	MergeMethod   string `json:"merge_method,omitempty"` // "merge", "squash", "rebase".
 }
 
+// PullRequestsMergeResponse is based on:
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#merge-a-pull-request
+type PullRequestsMergeResponse struct {
+	Merged  bool   `json:"merged"`
+	Message string `json:"message"`
+	SHA     string `json:"sha"`
+}
+
+// PullRequestsMerge is based on:
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#merge-a-pull-request
+func PullRequestsMerge(ctx workflow.Context, req PullRequestsMergeRequest) (*PullRequestsMergeResponse, error) {
+	return internal.ExecuteTimpaniActivity[PullRequestsMergeResponse](ctx, PullRequestsMergeActivityName, req)
+}
+
 // PullRequestsUpdateRequest is based on:
 // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#update-a-pull-request
 type PullRequestsUpdateRequest struct {
@@ -103,6 +142,12 @@ type PullRequestsCommentsCreateRequest struct {
 	Line        int    `json:"line,omitempty"`
 }
 
+// PullRequestsCommentsCreate is based on:
+// https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#create-a-review-comment-for-a-pull-request
+func PullRequestsCommentsCreate(ctx workflow.Context, req PullRequestsCommentsCreateRequest) (*PullComment, error) {
+	return internal.ExecuteTimpaniActivity[PullComment](ctx, PullRequestsCommentsCreateActivityName, req)
+}
+
 // PullRequestsCommentsCreateReplyRequest is based on:
 // https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#create-a-reply-for-a-review-comment
 type PullRequestsCommentsCreateReplyRequest struct {
@@ -110,6 +155,12 @@ type PullRequestsCommentsCreateReplyRequest struct {
 
 	CommentID int    `json:"comment_id"`
 	Body      string `json:"body"`
+}
+
+// PullRequestsCommentsCreateReply is based on:
+// https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#create-a-reply-for-a-review-comment
+func PullRequestsCommentsCreateReply(ctx workflow.Context, req PullRequestsCommentsCreateReplyRequest) (*PullComment, error) {
+	return internal.ExecuteTimpaniActivity[PullComment](ctx, PullRequestsCommentsCreateReplyActivityName, req)
 }
 
 // PullRequestsCommentsDeleteRequest is based on:
@@ -137,39 +188,196 @@ type PullRequestsReviewsCreateRequest struct {
 
 // PullRequestsReviewsDeleteRequest is based on:
 // https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#delete-a-pending-review-for-a-pull-request
-type PullRequestsReviewsDeleteRequest struct {
-	PullRequestsRequest
+type PullRequestsReviewsDeleteRequest = PullRequestsReviewsRequest
 
-	ReviewID int `json:"review_id"`
+// PullRequestsReviewsDelete is based on:
+// https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#delete-a-pending-review-for-a-pull-request
+func PullRequestsReviewsDelete(ctx workflow.Context, thrippyLinkID, owner, repo string, prID, reviewID int) error {
+	req := PullRequestsReviewsDeleteRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, PullNumber: prID, ReviewID: reviewID}
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsReviewsDeleteActivityName, req)
 }
 
 // PullRequestsReviewsDismissRequest is based on:
 // https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#dismiss-a-review-for-a-pull-request
 type PullRequestsReviewsDismissRequest struct {
-	PullRequestsRequest
+	PullRequestsReviewsRequest
 
-	ReviewID int    `json:"review_id"`
-	Message  string `json:"message"`
+	Message string `json:"message"`
 
 	Event string `json:"event,omitempty"` // "DISMISS", "".
+}
+
+// PullRequestsReviewsDismiss is based on:
+// https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#dismiss-a-review-for-a-pull-request
+func PullRequestsReviewsDismiss(ctx workflow.Context, req PullRequestsReviewsDismissRequest) (*Review, error) {
+	return internal.ExecuteTimpaniActivity[Review](ctx, PullRequestsReviewsDismissActivityName, req)
 }
 
 // PullRequestsReviewsSubmitRequest is based on:
 // https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#submit-a-review-for-a-pull-request
 type PullRequestsReviewsSubmitRequest struct {
-	PullRequestsRequest
+	PullRequestsReviewsRequest
 
-	ReviewID int    `json:"review_id"`
-	Body     string `json:"body,omitempty"`
+	Body string `json:"body,omitempty"`
 
 	Event string `json:"event,omitempty"` // "APPROVE", "REQUEST_CHANGES", "COMMENT".
+}
+
+// PullRequestsReviewsSubmit is based on:
+// https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#submit-a-review-for-a-pull-request
+func PullRequestsReviewsSubmit(ctx workflow.Context, req PullRequestsReviewsSubmitRequest) (*Review, error) {
+	return internal.ExecuteTimpaniActivity[Review](ctx, PullRequestsReviewsSubmitActivityName, req)
 }
 
 // PullRequestsReviewsUpdateRequest is based on:
 // https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#update-a-review-for-a-pull-request
 type PullRequestsReviewsUpdateRequest struct {
-	PullRequestsRequest
+	PullRequestsReviewsRequest
 
-	ReviewID int    `json:"review_id"`
+	Body string `json:"body"`
+}
+
+// PullRequestsReviewsUpdate is based on:
+// https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#update-a-review-for-a-pull-request
+func PullRequestsReviewsUpdate(ctx workflow.Context, req PullRequestsReviewsUpdateRequest) (*Review, error) {
+	return internal.ExecuteTimpaniActivity[Review](ctx, PullRequestsReviewsUpdateActivityName, req)
+}
+
+type AutoMerge struct {
+	EnabledBy     User   `json:"enabled_by"`
+	MergeMethod   string `json:"merge_method"`
+	CommitTitle   string `json:"commit_title"`
+	CommitMessage string `json:"commit_message"`
+}
+
+type Branch struct {
+	Label string     `json:"label"`
+	Ref   string     `json:"ref"`
+	SHA   string     `json:"sha"`
+	Repo  Repository `json:"repo"`
+	User  User       `json:"user"`
+}
+
+// PullRequest is based on:
+//   - https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28
+//   - https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
+type PullRequest struct {
+	ID       int64  `json:"id"`
+	NodeID   string `json:"node_id"`
+	HTMLURL  string `json:"html_url"`
+	DiffURL  string `json:"diff_url"`
+	PatchURL string `json:"patch_url"`
+
+	Number int    `json:"number"`
+	State  string `json:"state"` // "open" or "closed".
+	Title  string `json:"title"`
+	Body   string `json:"body"`
+
+	Draft            bool   `json:"draft,omitempty"`
+	Locked           bool   `json:"locked,omitempty"`
+	ActiveLockReason string `json:"active_lock_reason,omitempty"` // "off_topic", "too_heated", "resolved", "spam".
+	// Labels        []Label    `json:"labels,omitempty"`
+	// Milestone     *Milestone `json:"milestone,omitempty"`.
+
+	Comments       int `json:"comments,omitempty"`
+	ReviewComments int `json:"review_comments,omitempty"`
+	Commits        int `json:"commits,omitempty"`
+	Additions      int `json:"additions,omitempty"`
+	Deletions      int `json:"deletions,omitempty"`
+	ChangedFiles   int `json:"changed_files,omitempty"`
+
+	Head Branch `json:"head"`
+	Base Branch `json:"base"`
+
+	User               User   `json:"user"`
+	Assignee           *User  `json:"assignee,omitempty"`
+	Assignees          []User `json:"assignees,omitempty"`
+	RequestedReviewers []User `json:"requested_reviewers,omitempty"`
+	RequestedTeams     []Team `json:"requested_teams,omitempty"`
+
+	AutoMerge      *AutoMerge `json:"auto_merge,omitempty"`
+	Mergeable      bool       `json:"mergeable,omitempty"`
+	MergeableState string     `json:"mergeable_state,omitempty"` // "clean", "dirty", etc.
+	Rebaseable     bool       `json:"rebaseable,omitempty"`
+
+	CreatedAt time.Time `json:"created_at,omitzero"`
+	UpdatedAt time.Time `json:"updated_at,omitzero"`
+	ClosedAt  time.Time `json:"closed_at,omitzero"`
+	MergedAt  time.Time `json:"merged_at,omitzero"`
+
+	Merged         bool   `json:"merged,omitempty"`
+	MergedBy       *User  `json:"merged_by,omitempty"`
+	MergeCommitSHA string `json:"merge_commit_sha,omitempty"`
+}
+
+// PullComment is based on:
+//   - https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28
+//   - https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request_review_comment
+type PullComment struct {
+	ID      int    `json:"id"`
+	NodeID  string `json:"node_id"`
+	HTMLURL string `json:"html_url"`
+
+	PullRequestReviewID int    `json:"pull_request_review_id"`
+	InReplyTo           *int   `json:"in_reply_to_id,omitempty"`
+	CommitID            string `json:"commit_id"`
+	OriginalCommitID    string `json:"original_commit_id"`
+
+	Path        string `json:"path"`
+	SubjectType string `json:"subject_type,omitempty"`
+	DiffHunk    string `json:"diff_hunk,omitempty"`
+
+	User      User       `json:"user"`
+	Body      string     `json:"body"`
+	Reactions *Reactions `json:"reactions,omitempty"`
+
+	StartLine         int    `json:"start_line,omitzero"`
+	OriginalStartLine int    `json:"original_start_line,omitzero"`
+	StartSide         string `json:"start_side,omitzero"`
+	Line              int    `json:"line,omitzero"`
+	OriginalLine      int    `json:"original_line,omitzero"`
+	Side              string `json:"side,omitzero"`
+
+	CreatedAt time.Time `json:"created_at,omitzero"`
+	UpdatedAt time.Time `json:"updated_at,omitzero"`
+}
+
+// Repository is based on:
+//   - https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28
+//   - https://docs.github.com/en/webhooks/webhook-events-and-payloads#repository
+type Repository struct {
+	ID       int64  `json:"id"`
+	NodeID   string `json:"node_id"`
+	HTMLURL  string `json:"html_url"`
+	CloneURL string `json:"clone_url,omitempty"`
+	GitURL   string `json:"git_url,omitempty"`
+	SSHURL   string `json:"ssh_url,omitempty"`
+
+	Name        string  `json:"name"`
+	FullName    string  `json:"full_name"`
+	Description *string `json:"description,omitempty"`
+	Owner       *User   `json:"owner,omitempty"`
+
+	DefaultBranch string `json:"default_branch,omitempty"`
+	Private       bool   `json:"private"`
+	Fork          bool   `json:"fork"`
+
+	PushedAt time.Time `json:"pushed_at,omitzero"`
+}
+
+// Review is based on:
+//   - https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28
+//   - https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request_review
+type Review struct {
+	ID      int    `json:"id"`
+	NodeID  string `json:"node_id"`
+	HTMLURL string `json:"html_url"`
+
+	User     User   `json:"user"`
+	State    string `json:"state"`
 	Body     string `json:"body"`
+	CommitID string `json:"commit_id"`
+
+	SubmittedAt time.Time `json:"submitted_at,omitzero"`
+	UpdatedAt   time.Time `json:"updated_at,omitzero"`
 }
