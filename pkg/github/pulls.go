@@ -243,6 +243,7 @@ func PullRequestsReviewsUpdate(ctx workflow.Context, req PullRequestsReviewsUpda
 	return internal.ExecuteTimpaniActivity[Review](ctx, PullRequestsReviewsUpdateActivityName, req)
 }
 
+// AutoMerge is used in [PullRequest].
 type AutoMerge struct {
 	EnabledBy     User   `json:"enabled_by"`
 	MergeMethod   string `json:"merge_method"`
@@ -250,6 +251,7 @@ type AutoMerge struct {
 	CommitMessage string `json:"commit_message"`
 }
 
+// Branch is used in [PullRequest].
 type Branch struct {
 	Label string     `json:"label"`
 	Ref   string     `json:"ref"`
