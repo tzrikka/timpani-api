@@ -29,7 +29,7 @@ type IssuesCommentsCreateRequest struct {
 
 // IssuesCommentsCreate is based on:
 // https://docs.github.com/en/rest/issues/comments?apiVersion=2022-11-28#create-an-issue-comment
-func IssuesCommentsCreate(ctx workflow.Context, thrippyLinkID, owner, repo, body string, issue int) (*IssueComment, error) {
+func IssuesCommentsCreate(ctx workflow.Context, thrippyLinkID, owner, repo string, issue int, body string) (*IssueComment, error) {
 	req := IssuesCommentsCreateRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, IssueNumber: issue, Body: body}
 	return internal.ExecuteTimpaniActivity[IssueComment](ctx, IssuesCommentsCreateActivityName, req)
 }
@@ -65,7 +65,7 @@ type IssuesCommentsUpdateRequest struct {
 
 // IssuesCommentsUpdate is based on:
 // https://docs.github.com/en/rest/issues/comments?apiVersion=2022-11-28#update-an-issue-comment
-func IssuesCommentsUpdate(ctx workflow.Context, thrippyLinkID, owner, repo, body string, commentID int) (*IssueComment, error) {
+func IssuesCommentsUpdate(ctx workflow.Context, thrippyLinkID, owner, repo string, commentID int, body string) (*IssueComment, error) {
 	req := IssuesCommentsUpdateRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, CommentID: commentID, Body: body}
 	return internal.ExecuteTimpaniActivity[IssueComment](ctx, IssuesCommentsUpdateActivityName, req)
 }
