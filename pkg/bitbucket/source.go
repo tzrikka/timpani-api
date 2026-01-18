@@ -35,13 +35,8 @@ type SourceGetRequest struct {
 // SourceGetFile is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
 func SourceGetFile(ctx workflow.Context, thrippyLinkID, workspace, repo, commit, path string) (string, error) {
-	resp, err := internal.ExecuteTimpaniActivity[string](ctx, SourceGetFileActivityName, SourceGetRequest{
-		ThrippyLinkID: thrippyLinkID,
-		Workspace:     workspace,
-		RepoSlug:      repo,
-		Commit:        commit,
-		Path:          path,
-	})
+	req := SourceGetRequest{ThrippyLinkID: thrippyLinkID, Workspace: workspace, RepoSlug: repo, Commit: commit, Path: path}
+	resp, err := internal.ExecuteTimpaniActivity[string](ctx, SourceGetFileActivityName, req)
 	if err != nil {
 		return "", err
 	}
