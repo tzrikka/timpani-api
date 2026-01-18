@@ -32,28 +32,28 @@ const (
 type PullRequestsRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
-	Owner      string `json:"owner"`
-	Repo       string `json:"repo"`
-	PullNumber int    `json:"pull_number"`
+	Owner      string `json:"owner,omitempty"`
+	Repo       string `json:"repo,omitempty"`
+	PullNumber int    `json:"pull_number,omitempty"`
 }
 
 // PullRequestsCommentsRequest contains common fields for PR comment-related requests.
 type PullRequestsCommentsRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
-	Owner     string `json:"owner"`
-	Repo      string `json:"repo"`
-	CommentID int    `json:"comment_id"`
+	Owner     string `json:"owner,omitempty"`
+	Repo      string `json:"repo,omitempty"`
+	CommentID int    `json:"comment_id,omitempty"`
 }
 
 // PullRequestsReviewsRequest contains common fields for PR review-related requests.
 type PullRequestsReviewsRequest struct {
 	ThrippyLinkID string `json:"thrippy_link_id,omitempty"`
 
-	Owner      string `json:"owner"`
-	Repo       string `json:"repo"`
-	PullNumber int    `json:"pull_number"`
-	ReviewID   int    `json:"review_id"`
+	Owner      string `json:"owner,omitempty"`
+	Repo       string `json:"repo,omitempty"`
+	PullNumber int    `json:"pull_number,omitempty"`
+	ReviewID   int    `json:"review_id,omitempty"`
 }
 
 // PullRequestsGetRequest is based on:
@@ -153,7 +153,7 @@ func PullRequestsCommentsCreate(ctx workflow.Context, req PullRequestsCommentsCr
 type PullRequestsCommentsCreateReplyRequest struct {
 	PullRequestsRequest
 
-	CommentID int    `json:"comment_id"`
+	CommentID int    `json:"comment_id,omitempty"`
 	Body      string `json:"body"`
 }
 
@@ -167,12 +167,27 @@ func PullRequestsCommentsCreateReply(ctx workflow.Context, req PullRequestsComme
 // https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#delete-a-review-comment-for-a-pull-request
 type PullRequestsCommentsDeleteRequest = PullRequestsCommentsRequest
 
+// PullRequestsCommentsDelete is based on:
+// https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#delete-a-review-comment-for-a-pull-request
+func PullRequestsCommentsDelete(ctx workflow.Context, thrippyLinkID, owner, repo string, commentID int) error {
+	req := PullRequestsCommentsDeleteRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, CommentID: commentID}
+	return internal.ExecuteTimpaniActivityNoResp(ctx, PullRequestsCommentsDeleteActivityName, req)
+}
+
 // PullRequestsCommentsUpdateRequest is based on:
 // https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#update-a-review-comment-for-a-pull-request
 type PullRequestsCommentsUpdateRequest struct {
 	PullRequestsCommentsRequest
 
 	Body string `json:"body"`
+}
+
+// PullRequestsCommentsUpdate is based on:
+// https://docs.github.com/en/rest/pulls/comments?apiVersion=2022-11-28#update-a-review-comment-for-a-pull-request
+func PullRequestsCommentsUpdate(ctx workflow.Context, thrippyLinkID, owner, repo string, commentID int, body string) (*PullComment, error) {
+	comment := PullRequestsCommentsRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, CommentID: commentID}
+	req := PullRequestsCommentsUpdateRequest{PullRequestsCommentsRequest: comment, Body: body}
+	return internal.ExecuteTimpaniActivity[PullComment](ctx, PullRequestsCommentsUpdateActivityName, req)
 }
 
 // PullRequestsReviewsCreateRequest is based on:
@@ -184,6 +199,12 @@ type PullRequestsReviewsCreateRequest struct {
 	Body     string           `json:"body,omitempty"`
 	Event    string           `json:"event,omitempty"` // "APPROVE", "REQUEST_CHANGES", "COMMENT", "" = "PENDING".
 	Comments []map[string]any `json:"comments,omitempty"`
+}
+
+// PullRequestsReviewsCreate is based on:
+// https://docs.github.com/en/rest/pulls/reviews?apiVersion=2022-11-28#create-a-review-for-a-pull-request
+func PullRequestsReviewsCreate(ctx workflow.Context, req PullRequestsReviewsCreateRequest) (*Review, error) {
+	return internal.ExecuteTimpaniActivity[Review](ctx, PullRequestsReviewsCreateActivityName, req)
 }
 
 // PullRequestsReviewsDeleteRequest is based on:
@@ -203,8 +224,7 @@ type PullRequestsReviewsDismissRequest struct {
 	PullRequestsReviewsRequest
 
 	Message string `json:"message"`
-
-	Event string `json:"event,omitempty"` // "DISMISS", "".
+	Event   string `json:"event,omitempty"` // "DISMISS", "".
 }
 
 // PullRequestsReviewsDismiss is based on:
@@ -218,8 +238,7 @@ func PullRequestsReviewsDismiss(ctx workflow.Context, req PullRequestsReviewsDis
 type PullRequestsReviewsSubmitRequest struct {
 	PullRequestsReviewsRequest
 
-	Body string `json:"body,omitempty"`
-
+	Body  string `json:"body,omitempty"`
 	Event string `json:"event,omitempty"` // "APPROVE", "REQUEST_CHANGES", "COMMENT".
 }
 
