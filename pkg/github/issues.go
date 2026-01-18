@@ -105,6 +105,8 @@ type Issue struct {
 	CreatedAt time.Time `json:"created_at,omitzero"`
 	UpdatedAt time.Time `json:"updated_at,omitzero"`
 	ClosedAt  time.Time `json:"closed_at,omitzero"`
+
+	PerformedViaGitHubApp *App `json:"performed_via_github_app,omitempty"`
 }
 
 // IssueComment is based on:
@@ -121,6 +123,8 @@ type IssueComment struct {
 
 	CreatedAt time.Time `json:"created_at,omitzero"`
 	UpdatedAt time.Time `json:"updated_at,omitzero"`
+
+	PerformedViaGitHubApp *App `json:"performed_via_github_app,omitempty"`
 }
 
 // PullRequestLinks appears within an [Issue] when the issue is actually a [PullRequest].
