@@ -77,6 +77,20 @@ type PullRequestsListCommitsRequest struct {
 	Page    int `json:"page,omitempty"`
 }
 
+// PullRequestsListCommits is based on:
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-commits-on-a-pull-request
+//
+// Pagination is handled internally, but the results are limited to a maximum of 250 commits.
+// To receive a complete list, call [CommitsList].
+func PullRequestsListCommits(ctx workflow.Context, thrippyLinkID, owner, repo string, prID int) ([]Commit, error) {
+	req := PullRequestsRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, PullNumber: prID}
+	resp, err := internal.ExecuteTimpaniActivity[[]Commit](ctx, PullRequestsListCommitsActivityName, req)
+	if err != nil {
+		return nil, err
+	}
+	return *resp, nil
+}
+
 // PullRequestsListFilesRequest is based on:
 // https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests-files
 type PullRequestsListFilesRequest struct {
@@ -85,6 +99,19 @@ type PullRequestsListFilesRequest struct {
 	// https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api
 	PerPage int `json:"per_page,omitempty"`
 	Page    int `json:"page,omitempty"`
+}
+
+// PullRequestsListFiles is based on:
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests-files
+//
+// Pagination is handled internally, but the results are limited to a maximum of 3000 files.
+func PullRequestsListFiles(ctx workflow.Context, thrippyLinkID, owner, repo string, prID int) ([]File, error) {
+	req := PullRequestsRequest{ThrippyLinkID: thrippyLinkID, Owner: owner, Repo: repo, PullNumber: prID}
+	resp, err := internal.ExecuteTimpaniActivity[[]File](ctx, PullRequestsListFilesActivityName, req)
+	if err != nil {
+		return nil, err
+	}
+	return *resp, nil
 }
 
 // PullRequestsMergeRequest is based on:
@@ -277,6 +304,21 @@ type Branch struct {
 	SHA   string     `json:"sha"`
 	Repo  Repository `json:"repo"`
 	User  User       `json:"user"`
+}
+
+// File is based on:
+// https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests-files
+type File struct {
+	SHA         string `json:"sha"`
+	Filename    string `json:"filename"`
+	Status      string `json:"status"` // "added", "modified", "removed", "renamed".
+	Additions   int    `json:"additions"`
+	Deletions   int    `json:"deletions"`
+	Changes     int    `json:"changes"`
+	BlobURL     string `json:"blob_url"`
+	RawURL      string `json:"raw_url"`
+	ContentsURL string `json:"contents_url"`
+	Patch       string `json:"patch,omitempty"`
 }
 
 // PullRequest is based on:

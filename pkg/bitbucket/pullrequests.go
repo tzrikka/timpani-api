@@ -100,7 +100,7 @@ type PullRequestsDiffstatRequest struct {
 	PageLen string `json:"pagelen,omitempty"`
 	Page    string `json:"page,omitempty"`
 
-	Next string `json:"next,omitempty"`
+	Next string `json:"next,omitempty"` // Populated and used only in Timpani, for pagination.
 }
 
 // PullRequestsDiffstatResponse is based on:
@@ -177,7 +177,7 @@ type PullRequestsListActivityLogRequest struct {
 	PageLen string `json:"pagelen,omitempty"`
 	Page    string `json:"page,omitempty"`
 
-	Next string `json:"next,omitempty"`
+	Next string `json:"next,omitempty"` // Populated and used only in Timpani, for pagination.
 }
 
 // PullRequestsListActivityLogResponse is based on:
@@ -192,6 +192,8 @@ type PullRequestsListActivityLogResponse struct {
 
 // PullRequestsListActivityLog is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
+//
+// It retrieves the full list of activity log entries by handling pagination internally.
 func PullRequestsListActivityLog(ctx workflow.Context, req PullRequestsListActivityLogRequest) ([]map[string]any, error) {
 	var activities []map[string]any
 	for req.Next != "" {
@@ -220,7 +222,7 @@ type PullRequestsListCommitsRequest struct {
 	PageLen string `json:"pagelen,omitempty"`
 	Page    string `json:"page,omitempty"`
 
-	Next string `json:"next,omitempty"`
+	Next string `json:"next,omitempty"` // Populated and used only in Timpani, for pagination.
 }
 
 // PullRequestsListCommitsResponse is based on:
@@ -273,7 +275,7 @@ type PullRequestsListForCommitRequest struct {
 	PageLen string `json:"pagelen,omitempty"`
 	Page    string `json:"page,omitempty"`
 
-	Next string `json:"next,omitempty"`
+	Next string `json:"next,omitempty"` // Populated and used only in Timpani, for pagination.
 }
 
 // PullRequestsListForCommitResponse is based on:
@@ -289,6 +291,8 @@ type PullRequestsListForCommitResponse struct {
 
 // PullRequestsListForCommit is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-commit-commit-pullrequests-get
+//
+// It retrieves the full list of PRs by handling pagination internally.
 func PullRequestsListForCommit(ctx workflow.Context, req PullRequestsListForCommitRequest) ([]map[string]any, error) {
 	var prs []map[string]any
 	for req.Next != "" {

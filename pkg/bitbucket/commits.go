@@ -50,7 +50,8 @@ type CommitsDiffstatRequest struct {
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
 	PageLen string `json:"pagelen,omitempty"`
 	Page    string `json:"page,omitempty"`
-	Next    string `json:"next,omitempty"`
+
+	Next string `json:"next,omitempty"` // Populated and used only in Timpani, for pagination.
 }
 
 // CommitsDiffstatResponse is based on:
@@ -59,15 +60,16 @@ type CommitsDiffstatResponse struct {
 	Values []Diffstat `json:"values"`
 
 	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
-	Size    int `json:"size,omitempty"`
-	PageLen int `json:"pagelen,omitempty"`
-	Page    int `json:"page,omitempty"`
-
-	Next string `json:"next,omitempty"`
+	Size    int    `json:"size,omitempty"`
+	PageLen int    `json:"pagelen,omitempty"`
+	Page    int    `json:"page,omitempty"`
+	Next    string `json:"next,omitempty"`
 }
 
 // CommitsDiffstat is based on:
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get
+//
+// It retrieves the full list of diffstat entries by handling pagination internally.
 func CommitsDiffstat(ctx workflow.Context, req CommitsDiffstatRequest) ([]Diffstat, error) {
 	var ds []Diffstat
 	for req.Next != "" {
