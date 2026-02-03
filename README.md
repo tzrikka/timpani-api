@@ -8,7 +8,7 @@ Thin, easy-to-use API wrappers for [Temporal](https://temporal.io/) workflows th
 
 This package is not required in order to use Timpani. However, it saves time, simplifies code, minimizes duplication, and prevents mistakes.
 
-Timpani is a Temporal worker that sends API calls and receives asynchronous event notifications to/from various well-known third-party services.
+Timpani is a Temporal worker that sends API calls and receives asynchronous event notifications to/from a variety of well-known third-party services.
 
 ## Usage
 
