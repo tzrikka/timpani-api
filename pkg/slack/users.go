@@ -156,7 +156,7 @@ type User struct {
 	ID       string `json:"id"`
 	TeamID   string `json:"team_id"`
 	RealName string `json:"real_name"`
-	IsBot    bool   `json:"is_bot"`
+	IsBot    bool   `json:"is_bot,omitempty"`
 
 	TZ       string `json:"tz"`
 	TZLabel  string `json:"tz_label"`
