@@ -1,6 +1,8 @@
 package bitbucket
 
 import (
+	"time"
+
 	"go.temporal.io/sdk/workflow"
 
 	"github.com/tzrikka/timpani-api/internal"
@@ -18,6 +20,7 @@ const (
 	PullRequestsListActivityLogActivityName = "bitbucket.pullrequests.listActivityLog"
 	PullRequestsListCommitsActivityName     = "bitbucket.pullrequests.listCommits"
 	PullRequestsListForCommitActivityName   = "bitbucket.pullrequests.listForCommit"
+	PullRequestsListTasksActivityName       = "bitbucket.pullrequests.listTasks"
 	PullRequestsMergeActivityName           = "bitbucket.pullrequests.merge"
 	PullRequestsUnapproveActivityName       = "bitbucket.pullrequests.unapprove"
 	PullRequestsUpdateActivityName          = "bitbucket.pullrequests.update"
@@ -194,7 +197,10 @@ type PullRequestsListActivityLogResponse struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-activity-get
 //
 // It retrieves the full list of activity log entries by handling pagination internally.
-func PullRequestsListActivityLog(ctx workflow.Context, req PullRequestsListActivityLogRequest) ([]map[string]any, error) {
+func PullRequestsListActivityLog(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string) ([]map[string]any, error) {
+	pr := PullRequestsRequest{ThrippyLinkID: thrippyLinkID, Workspace: workspace, RepoSlug: repo, PullRequestID: prID}
+	req := PullRequestsListActivityLogRequest{PullRequestsRequest: pr, Next: "start"}
+
 	var activities []map[string]any
 	for req.Next != "" {
 		if req.Next == "start" {
@@ -293,7 +299,9 @@ type PullRequestsListForCommitResponse struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-commit-commit-pullrequests-get
 //
 // It retrieves the full list of PRs by handling pagination internally.
-func PullRequestsListForCommit(ctx workflow.Context, req PullRequestsListForCommitRequest) ([]map[string]any, error) {
+func PullRequestsListForCommit(ctx workflow.Context, thrippyLinkID, workspace, repo, commit string) ([]map[string]any, error) {
+	req := PullRequestsListForCommitRequest{ThrippyLinkID: thrippyLinkID, Workspace: workspace, RepoSlug: repo, Commit: commit, Next: "start"}
+
 	var prs []map[string]any
 	for req.Next != "" {
 		if req.Next == "start" {
@@ -310,6 +318,56 @@ func PullRequestsListForCommit(ctx workflow.Context, req PullRequestsListForComm
 	}
 
 	return prs, nil
+}
+
+// PullRequestsListTasksRequest is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-tasks-get
+type PullRequestsListTasksRequest struct {
+	PullRequestsRequest
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	PageLen string `json:"pagelen,omitempty"`
+	Page    string `json:"page,omitempty"`
+
+	Next string `json:"next,omitempty"` // Populated and used only in Timpani, for pagination.
+}
+
+// PullRequestsListTasksResponse is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-tasks-get
+type PullRequestsListTasksResponse struct {
+	Values []Task `json:"values"`
+
+	// https://developer.atlassian.com/cloud/bitbucket/rest/intro/#pagination
+	Size    int    `json:"size,omitempty"`
+	PageLen int    `json:"pagelen,omitempty"`
+	Page    int    `json:"page,omitempty"`
+	Next    string `json:"next,omitempty"`
+}
+
+// PullRequestsListTasks is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-tasks-get
+//
+// It retrieves the full list of tasks by handling pagination internally.
+func PullRequestsListTasks(ctx workflow.Context, thrippyLinkID, workspace, repo, prID string) ([]Task, error) {
+	pr := PullRequestsRequest{ThrippyLinkID: thrippyLinkID, Workspace: workspace, RepoSlug: repo, PullRequestID: prID}
+	req := PullRequestsListTasksRequest{PullRequestsRequest: pr, Next: "start"}
+
+	var tasks []Task
+	for req.Next != "" {
+		if req.Next == "start" {
+			req.Next = ""
+		}
+
+		resp, err := internal.ExecuteTimpaniActivity[PullRequestsListTasksResponse](ctx, PullRequestsListTasksActivityName, req)
+		if err != nil {
+			return nil, err
+		}
+
+		tasks = append(tasks, resp.Values...)
+		req.Next = resp.Next
+	}
+
+	return tasks, nil
 }
 
 // PullRequestsMergeRequest is based on:
@@ -385,10 +443,10 @@ type Comment struct {
 	ID     int     `json:"id"`
 	Parent *Parent `json:"parent,omitempty"`
 
-	CreatedOn string `json:"created_on"`
-	UpdatedOn string `json:"updated_on"`
-	Deleted   bool   `json:"deleted"`
-	Pending   bool   `json:"pending"`
+	CreatedOn time.Time `json:"created_on"`
+	UpdatedOn time.Time `json:"updated_on,omitzero"`
+	Deleted   bool      `json:"deleted,omitempty"`
+	Pending   bool      `json:"pending,omitempty"`
 
 	Content Rendered `json:"content"`
 	Inline  *Inline  `json:"inline"`
@@ -427,7 +485,7 @@ type Inline struct {
 	To        *int `json:"to"`
 
 	ContextLines string `json:"context_lines"`
-	Outdated     bool   `json:"outdated"`
+	Outdated     bool   `json:"outdated,omitempty"`
 
 	SrcRev  string `json:"src_rev"`
 	DestRev string `json:"dest_rev"`
@@ -455,3 +513,22 @@ type Rendered struct {
 	Markup string `json:"markup"`
 	HTML   string `json:"html"`
 } //revive:enable:exported
+
+// Task is based on:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-tasks-get
+type Task struct {
+	ID      int      `json:"id"`
+	State   bool     `json:"state"`
+	Content Rendered `json:"content"`
+	Creator User     `json:"creator"`
+
+	CreatedOn time.Time `json:"created_on"`
+	UpdatedOn time.Time `json:"updated_on,omitzero"`
+	Pending   bool      `json:"pending,omitempty"`
+
+	ResolvedBy *User     `json:"resolved_by,omitempty"`
+	ResolvedOn time.Time `json:"resolved_on,omitzero"`
+
+	// Comment                              // Unnecessary.
+	// Links map[string]Link `json:"links"` // Unnecessary.
+}
