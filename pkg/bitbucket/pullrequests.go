@@ -518,7 +518,7 @@ type Rendered struct {
 // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-tasks-get
 type Task struct {
 	ID      int      `json:"id"`
-	State   bool     `json:"state"`
+	State   string   `json:"state"`
 	Content Rendered `json:"content"`
 	Creator User     `json:"creator"`
 
