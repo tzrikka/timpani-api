@@ -440,17 +440,17 @@ func PullRequestsUpdateComment(ctx workflow.Context, thrippyLinkID, workspace, r
 type Comment struct {
 	// Type string `json:"type"` // Always "pullrequest_comment".
 
-	ID     int     `json:"id"`
-	Parent *Parent `json:"parent,omitempty"`
+	ID      int      `json:"id"`
+	Content Rendered `json:"content"`
+	Inline  *Inline  `json:"inline,omitempty"`
+	User    User     `json:"user"`
 
 	CreatedOn time.Time `json:"created_on"`
 	UpdatedOn time.Time `json:"updated_on,omitzero"`
 	Deleted   bool      `json:"deleted,omitempty"`
 	Pending   bool      `json:"pending,omitempty"`
 
-	Content Rendered `json:"content"`
-	Inline  *Inline  `json:"inline"`
-	User    User     `json:"user"`
+	Parent *Parent `json:"parent,omitempty"`
 
 	// PullRequest `json:"pullrequest"` // Unnecessary.
 
@@ -479,10 +479,10 @@ type Commit struct {
 type Inline struct {
 	Path string `json:"path"`
 
-	StartFrom *int `json:"start_from"`
-	StartTo   *int `json:"start_to"`
-	From      *int `json:"from"`
-	To        *int `json:"to"`
+	StartFrom *int `json:"start_from,omitempty"`
+	StartTo   *int `json:"start_to,omitempty"`
+	From      *int `json:"from,omitempty"`
+	To        *int `json:"to,omitempty"`
 
 	ContextLines string `json:"context_lines"`
 	Outdated     bool   `json:"outdated,omitempty"`
