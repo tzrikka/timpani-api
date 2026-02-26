@@ -22,8 +22,9 @@ jobs:
           go-version-file: go.mod
       - name: Build
         run: go build -v ./...
+
       - name: Lint
         uses: golangci/golangci-lint-action@v9 # https://github.com/marketplace/actions/golangci-lint
         with:
-          version: v2.9.0     # https://github.com/golangci/golangci-lint/releases
-          args: --timeout=5m  # https://github.com/golangci/golangci-lint-action/issues/308
+          version: v2.10.1   # https://github.com/golangci/golangci-lint/releases
+          args: --timeout=5m # https://github.com/golangci/golangci-lint-action/issues/308

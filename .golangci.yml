@@ -5,7 +5,6 @@ linters:
     - asasalint
     - asciicheck
     - bidichk
-    - canonicalheader
     - containedctx
     - contextcheck
     - copyloopvar
@@ -27,6 +26,7 @@ linters:
     - gosmopolitan
     - govet
     - iface
+    - importas
     - ineffassign
     - intrange
     - mirror
@@ -34,6 +34,7 @@ linters:
     - modernize
     - musttag
     - noctx
+    - nolintlint
     - nosprintfhostport
     - perfsprint
     - predeclared
@@ -42,10 +43,13 @@ linters:
     - revive
     - staticcheck
     - thelper
+    - tparallel
     - unconvert
+    - unparam
     - unused
     - usestdlibvars
     - usetesting
+    - wrapcheck
 
   settings:
     errcheck:
@@ -58,10 +62,19 @@ linters:
         - identical
         - unused
         - unexported
+    importas:
+      no-extra-aliases: true
     misspell:
       locale: US
+    nolintlint:
+      allow-unused: false
+      require-explanation: true
     predeclared:
       qualified-name: true
+    wrapcheck:
+      ignore-package-globs:
+        - github.com/tzrikka/timpani-api/internal
+        - go.temporal.io/sdk/internal
 
 formatters:
   enable:
