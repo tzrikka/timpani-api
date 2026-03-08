@@ -48,8 +48,9 @@ func UsersGetCurrent(ctx workflow.Context) (*User, error) {
 //   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-get
 //   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-users-selected-user-get
 //   - https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-members-get
+//   - https://developer.atlassian.com/cloud/bitbucket/announcement-introducing-app-user/
 type User struct {
-	Type string `json:"type"`
+	Type string `json:"type"` // "user" or "app_user".
 
 	DisplayName string `json:"display_name"`
 	Nickname    string `json:"nickname"`
